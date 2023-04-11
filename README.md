@@ -5,3 +5,7 @@ This is my notes for studying something. I'm not sure what this *something* is. 
 I may fill this repo in Chinese on the way of my study in future. If I have enough time, I will consider provide an English version.
 
 Wish me luck!
+
+## Lists
+
+- [ ] The Missing Semester of Your CS Education
