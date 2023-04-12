@@ -9,3 +9,4 @@ Wish me luck!
 ## Lists
 
 - [ ] The Missing Semester of Your CS Education
+- [ ] Shell Programming
