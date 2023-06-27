@@ -24,7 +24,7 @@ And still, as we all know, **the `man` program is our friend**.
   - `$foo` is for the variable `foo`.
   - *`$0`*, `$1`, `$2` are for *the executed command* or *the name of the script*, the 1st parameter, the 2nd parameter, etc.
   - `$@` is for all the arguments.
-  - `$@` is for the number of arguments.
+  - `$#` is for the number of arguments.
   - `$_` is for the lastest parameter.
   - `$?` is for the code returned by the previous command.
   - `$$` is for the Process Identification Number(PID) of the current script/command.
