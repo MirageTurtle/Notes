@@ -81,3 +81,54 @@ See comments for details. Among those to be highlighted are:
 > Create Time: 2023.06.28   Update Time:2023.06.28
 
 Even though I'm an Emacser, I listened to this lecture. Because I was a Vimer, and I believe there're some commonalities between the editors. Actually, Vim and Emacs are both powerful for me. But when I first learned Vim, I did't know much about CS and I didn't have the ability to study Vim very well. After that, I started using VS Code, one of the mose popular programming editor now. Now I'm still a Emacs beginner, and I can't do some quick operations which Vim can do easily by one or two keys. But I think I have the ability to study Emacs, and I can do some quick operations which I couldn't do by Vim(I'm not familiar with Vim actually). I'm not saying Emacs is better Vim, but I think it's more suitable for me. **Wish everyone finds his editors.**
+
+## Lecture 4: Data Wrangling
+
+>  Create Time: 2023.06.28   Update Time:2023.06.28
+
+Data wrangling means changing data with one format into some different formats. When you want to analyse some data or get some sepcific informations from too many informations, it's very useful.
+
+### Some useful tools maybe
+
+#### Basic
+
+- **Pipeline `|`**
+- **`grep`**
+- **`sed`**: a stream editor, based on `ed` which is an old editor.
+- Regular expressions
+- `wc`
+- `sort`
+- `uniq`
+- **`awk`**: a column-based stream processor.
+- `paste`
+- `xargs`
+
+#### Advanced
+
+- `bc`
+- Some advanced program language scripts or programs
+- `gnuplot`
+- `ffmpeg`
+- `feh`
+
+### Regular expressions
+
+!!! Complicated Mention!
+
+#### Basic
+
+- `.` is for any characters
+- `*` is for any times(0 or more), `?` is for 0 or 1 times, `+` is for 1 or more times.
+- `^` is for the begin of a line, while `$` is for the end.
+- `[]` can list all character candidates, and you can use range syntax in it.
+- The default mode is greedy match, you can use non-greedy match by suffix a `*` or a `+` with a `?`.
+
+#### Capture group
+
+- Use `()` capture some informations, which we call capture group.
+- The capture group is useful because you can use the content of these groups by index if need.
+- Actually, I think capture groups are sometimes wasteful. If you want use `*`, `?` or `+` for some words or some character groups, you need to use syntax like `(some words)?`, and this capture group is wasted if you don't care about it.
+
+#### Debugger
+
+- [regular expressions 101](https://regex101.com/)
