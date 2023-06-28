@@ -141,3 +141,58 @@ Data wrangling means changing data with one format into some different formats. 
 - Shot interactive regex tutorial: [RegexOne](https://regexone.com/)
 
 - Debugger: [regular expressions 101](https://regex101.com/)
+
+## Lecture 5: Command-line Environment
+
+> Create Time: 2023.06.28   Update Time:2023.06.28
+
+### Job Control
+
+- Unix communication mechanism: signal. You can use `man signal` for details.
+  - `C-C` is for interrupting the current program(`SIGINT`).
+  - `C-\` is for quiting the current program(`SIGQUIT`).
+  - `C-Z` is for stopping the current program(`SIGSTOP`).
+  - Some signals can not be captured by program, e.g., `SIGKILL`.
+- You can use `jobs` command for your all jobs.
+- Using `kill` command to send a signal to a job.
+- Closing the terminal when a program is running will send `SIGHUP` to the program.
+- You can use `nohup` command for a program to no `SIGHUP` signal.
+- `bg` and `fg` command is for continuing the paused job in the *background* and *foreground* respectively.
+
+### Terminal Multiplexers
+
+> Now I have another dotfile to configure…
+
+Hierarchy:
+
+- **Sessions**: A session is an independent workspace with one or more windows.
+- **Windows**: Equivalent to tabs in editors or browsers, they are visually separate parts of the same session.
+  - `<PREFIX> c` *Create* a new window.
+  - `<PREFIX> p` and `<PREFIX n` *Previous* and *next* window respectively.
+  - `<PREFIX> ,` Rename the current window.
+  - `<PREFIX> w` List all windows of the current session.
+- **Panes**: A pane is corresponding a shell.
+  - `<PREFIX> ,"` and `<PREFIX %` Split a window into two panes horizontally and vertically.
+  - `<PREFIX> <DIRECTION>` Move to the pane in the specified direction.
+  - `<PREFIX> z` Toggle zoom for the current pane.
+
+Tmux is like Emacs, you can use commands for all things, and you can use shortcuts for some commands.
+
+Many people remapped the prefix to `C-A` instead of the default `C-B`.
+
+```conf
+unbind-key C-b
+set-option -g prefix C-a
+bind-key C-a send-prefix
+```
+
+You can use `C-d` Terminate the current shell.
+
+#### Tutorial for tmux
+
+- [A Quick and Easy Guide to tmux](https://www.hamvocke.com/blog/a-quick-and-easy-guide-to-tmux/)
+- [Linux Command Line Adventure: Terminal Multiplexers](http://linuxcommand.org/lc3_adv_termmux.php)
+
+### Dotfiles and Remote Machine
+
+> I'm familiar with these two parts. So I didn't note anything for this. Sorry about this.
