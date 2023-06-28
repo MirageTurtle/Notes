@@ -76,3 +76,8 @@ See comments for details. Among those to be highlighted are:
 
 > Besides all above, I know I have many commands to study, e.g., `awk` and `xargs`. I used some commands for some temporary tasks based on some online information, but I don't understand them actually. I will study them in my future shell works, and update this note if need.
 
+## Lecture 3: Editors(Vim)
+
+> Create Time: 2023.06.28   Update Time:2023.06.28
+
+Even though I'm an Emacser, I listened to this lecture. Because I was a Vimer, and I believe there're some commonalities between the editors. Actually, Vim and Emacs are both powerful for me. But when I first learned Vim, I did't know much about CS and I didn't have the ability to study Vim very well. After that, I started using VS Code, one of the mose popular programming editor now. Now I'm still a Emacs beginner, and I can't do some quick operations which Vim can do easily by one or two keys. But I think I have the ability to study Emacs, and I can do some quick operations which I couldn't do by Vim(I'm not familiar with Vim actually). I'm not saying Emacs is better Vim, but I think it's more suitable for me. **Wish everyone finds his editors.**
