@@ -110,6 +110,8 @@ Data wrangling means changing data with one format into some different formats. 
 - `gnuplot`
 - `ffmpeg`
 - `feh`
+- `pup` for HTML.
+- `jq` for JSON.
 
 ### Regular expressions
 
@@ -117,11 +119,16 @@ Data wrangling means changing data with one format into some different formats. 
 
 #### Basic
 
-- `.` is for any characters
+- `.` is for any characters, and you need to use `\.` for period.
 - `*` is for any times(0 or more), `?` is for 0 or 1 times, `+` is for 1 or more times.
 - `^` is for the begin of a line, while `$` is for the end.
 - `[]` can list all character candidates, and you can use range syntax in it.
+- `{}` is for repetition times.
+- `^` is for not. For an instance, `[abc]` means all candidates are a, b, and c, `[^abc]` means not a, not b, and not c.
 - The default mode is greedy match, you can use non-greedy match by suffix a `*` or a `+` with a `?`.
+- `\d` means any digit, while `\D` means any non-digit character.
+- `\w` means any alphanumeric character, while `\W` means any non-alphanumeric character.
+- `\s` means any whitespace, while `\S` means any non-whitespace character.
 
 #### Capture group
 
@@ -129,6 +136,8 @@ Data wrangling means changing data with one format into some different formats. 
 - The capture group is useful because you can use the content of these groups by index if need.
 - Actually, I think capture groups are sometimes wasteful. If you want use `*`, `?` or `+` for some words or some character groups, you need to use syntax like `(some words)?`, and this capture group is wasted if you don't care about it.
 
-#### Debugger
+#### Some helpers
 
-- [regular expressions 101](https://regex101.com/)
+- Shot interactive regex tutorial: [RegexOne](https://regexone.com/)
+
+- Debugger: [regular expressions 101](https://regex101.com/)
