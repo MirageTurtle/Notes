@@ -196,3 +196,40 @@ You can use `C-d` Terminate the current shell.
 ### Dotfiles and Remote Machine
 
 > I'm familiar with these two parts. So I didn't note anything for this. Sorry about this.
+
+## Lecture 6: Version Control(Git)
+
+> Create Time: 2023.06.28   Update Time:2023.06.29
+
+> I like the content of this lecture, since it shows me the beautiful ideas underlying git. I have been a git user since about 3 years ago, but I don't understand what git does when I press enter after the command.
+
+### The well-though-out model
+
+#### Element model
+
+- A *tree* is a folder and a *blob* is a file.
+- Git uses a directed acyclic graph to model history. Every state points back to which state preceded it.
+
+#### Data structure
+
+```
+type blob = array<byte>
+type tree = map<string, blob|tree>
+type commit = struct {
+	parents: array<commit>,
+	author: string,
+	message: string,
+	snapshot: tree
+}
+type object = blob|tree|commit
+type references = map<string, string>  # readable string to id(SHA-1)
+objects = map<string ,object>  # the string is id by SHA-1
+```
+
+All things in a commit are pointers. All objects can be addressed by their hash.
+
+> Since I use git for a long time, I still don't note so many things about the using about git but the model things. Sorry about that.
+
+#### Resources highly recommended
+
+- [Pro Git](https://git-scm.com/book/en/v2)
