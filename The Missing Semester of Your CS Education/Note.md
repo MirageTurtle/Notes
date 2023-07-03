@@ -84,7 +84,7 @@ Even though I'm an Emacser, I listened to this lecture. Because I was a Vimer, a
 
 ## Lecture 4: Data Wrangling
 
->  Create Time: 2023.06.28   Update Time:2023.06.28
+>  Create Time: 2023.06.28   Update Time:2023.07.03
 
 Data wrangling means changing data with one format into some different formats. When you want to analyse some data or get some sepcific informations from too many informations, it's very useful.
 
@@ -111,7 +111,7 @@ Data wrangling means changing data with one format into some different formats. 
 - `ffmpeg`
 - `feh`
 - `pup` for HTML.
-- `jq` for JSON.
+- [`jq`](https://github.com/jqlang/jq) for JSON.
 
 ### Regular expressions
 
@@ -172,7 +172,7 @@ Hierarchy:
   - `<PREFIX> ,` Rename the current window.
   - `<PREFIX> w` List all windows of the current session.
 - **Panes**: A pane is corresponding a shell.
-  - `<PREFIX> ,"` and `<PREFIX %` Split a window into two panes horizontally and vertically.
+  - `<PREFIX> "` and `<PREFIX %` Split a window into two panes horizontally and vertically.
   - `<PREFIX> <DIRECTION>` Move to the pane in the specified direction.
   - `<PREFIX> z` Toggle zoom for the current pane.
 
