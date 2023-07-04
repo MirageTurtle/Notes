@@ -335,3 +335,44 @@ Tools like [`hyperfine`](https://github.com/sharkdp/hyperfine) let you quickly b
 - [Premature Optimization](http://wiki.c2.com/?PrematureOptimization)
 - [How do Ruby & Python profilers work?](https://jvns.ca/blog/2017/12/17/how-do-ruby---python-profilers-work-/)
 
+## Lecture 8: Metaprogramming
+
+> Create Time: 2023.07.04   Update Time:2023.07.04
+
+### Build Systems
+
+For most projects, whether they contain code or not, there is a "build process'. You need to do some sequences of operations for the task, e.g., some dependencies, some targets and some rules. So you can use so-called "build system" to help you. It find all the transitive dependencies, and then apply the rules to produce intermediate targets all the way until the final target has been produced.
+
+#### `make`
+
+Here we focus on `make` tool, which is one of the most common build systems out there. It has its warts, but works quite well for simple-to-moderate projects.
+
+When you run `make`, it consults a file called `Makefile` in the current directory. This file defines all the targets, their dependencies, and the rules.
+
+Here's a straightforward simple case.
+
+```makefile
+paper.pdf: paper.tex plot-data.png
+	pdflatex paper.tex
+
+plot-%.png: %.dat plot.py
+	./plot.py -i $*.dat -o $@
+```
+
+`%` is a wildcard character. `$*` will be substituted by the characters captured by `%`, and `$@` will be substituted by the target string.
+
+I was going to finish this case on my machine, but unfortunately, I deleted LaTeX from my machine and moved my works to Overleaf six months ago. So I just note that, and no files in my repo. You can get the codes on the official websites.
+
+### Dependency Management
+
+There's a lot of tools for dependency managements, but here Jon want to tell about the version number. One relatively common standard is [semantic versioning](https://semver.org/). With semantic versioning, every version number is of the form: `major.minor.patch`. The rules are:
+
+- If a new release does not change the API, increase the patch version.
+- If you add to your API in a backwards-compatible way, increase the minor version.
+- If you change the API in a non-backwards-compatible way, increase the major version.
+
+When working with dependency management systems, you may also come across the notion of *lock file*. A lock file is simply a file that lists the exact version you are currently depending on of each dependency. An extreme version of this kind of dependency locking is *vendering*, which is where you copy all the code of your dependencies into your own project.
+
+Thank Jon for letting me know about the version number which I've been trying to know about for a long time.
+
+### Continuous Integration System
