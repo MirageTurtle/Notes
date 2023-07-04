@@ -376,3 +376,15 @@ When working with dependency management systems, you may also come across the no
 Thank Jon for letting me know about the version number which I've been trying to know about for a long time.
 
 ### Continuous Integration System
+
+Continuous integration, or CI, is an umbrella term of "stuff that runs whether your code changes". It's like an event-trigger. When the event triggers, the CI provider spins up a virtual machines (or more), runs the commands in your "*recipe*", and then usually notes down the results somewhere. GitHub Pages is a good example of a CI system.
+
+#### a brief aside on testing
+
+Most large software projects come with a "test suite", and they often use CI for testing. Here're some testing terminology that you may encounter:
+
+- Test suite: a collective term for all the tests.
+- Unit test: a "micro-test" that tests a specific feature in isolation
+- Integration test: a "macro-test" that runs a larger part of the system to check that different features or components work together.
+- Regression test: a test that implements a particular pattern that previously caused a bug to ensure that the bug does not resurface.
+- Mocking: to replace a function, module, or type with a fake implementation to avoid testing unrelated functionality. For example, you can mock a network or mock a disk.
