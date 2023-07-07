@@ -8,5 +8,9 @@ Wish me luck!
 
 ## Lists
 
-- [ ] The Missing Semester of Your CS Education
-- [ ] Shell Programming
+- [x] The Missing Semester of Your CS Education
+- [ ] MIT 6.S081: Operating System Engineering
+- [ ] Stanford CS144: Computer Network
+- [ ] UCB CS161: Computer Security
+- [ ] ASU CSE365: Introduction to Cybersecurity
+- [ ] ASU CSE466: Computer Systems Security
