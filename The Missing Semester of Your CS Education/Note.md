@@ -1,5 +1,7 @@
 # The Missing Semester of Your CS Education
 
+> 
+
 ## Lecture 1: Course overview + the shell
 
 > Create Time: 2023.06.23   Update Time:2023.06.23
@@ -84,7 +86,7 @@ Even though I'm an Emacser, I listened to this lecture. Because I was a Vimer, a
 
 ## Lecture 4: Data Wrangling
 
->  Create Time: 2023.06.28   Update Time:2023.07.03
+>  Create Time: 2023.06.28   Update Time:2023.07.08
 
 Data wrangling means changing data with one format into some different formats. When you want to analyse some data or get some sepcific informations from too many informations, it's very useful.
 
@@ -112,6 +114,9 @@ Data wrangling means changing data with one format into some different formats. 
 - `feh`
 - `pup` for HTML.
 - [`jq`](https://github.com/jqlang/jq) for JSON.
+- perl (recommend in Lecture 11: Q&A)
+- pandoc (recommend in Lecture 11: Q&A)
+- R (recommend in Lecture 11: Q&A)
 
 ### Regular expressions
 
@@ -236,7 +241,7 @@ All things in a commit are pointers. All objects can be addressed by their hash.
 
 ## Lecture 7: Debugging and Profiling
 
-> Create Time: 2023.06.29   Update Time:2023.06.29
+> Create Time: 2023.06.29   Update Time:2023.07.08
 
 ### Debugging
 
@@ -297,6 +302,8 @@ There are two main types of CPU profilers: *tracing* and *sampling* profilers. T
 #### Memory
 
 [Valgrind](https://valgrind.org/) and `memory_profiler` Python module.
+
+[Cache grind](https://valgrind.org/docs/manual/cg-manual.html) from Valgrind. (Recommend in Lecture 11: Q&A)
 
 #### Event
 
@@ -390,6 +397,8 @@ Most large software projects come with a "test suite", and they often use CI for
 - Mocking: to replace a function, module, or type with a fake implementation to avoid testing unrelated functionality. For example, you can mock a network or mock a disk.
 
 ## Lecture 9: Security and Cryptography
+
+> Create Time: 2023.07.06   Update Time:2023.07.06
 
 ### Entropy
 
@@ -497,7 +506,9 @@ When you run `ssh-keygen`, it generates an asymmetric keypair, `public_key, priv
 
 In use, once the server knows the client’s public key (stored in the `.ssh/authorized_keys` file), a connecting client can prove its identity using asymmetric signatures. This is done through [challenge-response](https://en.wikipedia.org/wiki/Challenge–response_authentication). At a high level, the server picks a random number and sends it to the client. The client then signs this message and sends the signature back to the server, which checks the signature against the public key on record. This effectively proves that the client is in possession of the private key corresponding to the public key that’s in the server’s `.ssh/authorized_keys` file, so the server can allow the client to log in.
 
-## Lecture 9: Potpourri
+## Lecture 10: Potpourri
+
+> Create Time: 2023.07.07   Update Time:2023.07.07
 
 > I may copy something basic from [the lecture notes](https://missing.csail.mit.edu/2020/potpourri/, because I'm a little familiar with most things of this lecture.
 
@@ -553,7 +564,7 @@ VPNs are all the rage these days, but it’s not clear that’s for [any good re
 
 ### Markdown
 
-I write this not in Markdown and I really recommand it.
+I write this not in Markdown and I really recommend it.
 
 ### Hammerspoon
 
@@ -589,3 +600,9 @@ When your machine boots up, before the operating system is loaded, the [BIOS](ht
 
 - Creating an [issue](https://help.github.com/en/github/managing-your-work-on-github/creating-an-issue). This can be used to report bugs or request a new feature. Neither of these involves reading or writing code, so it can be pretty lightweight to do. High-quality bug reports can be extremely valuable to developers. Commenting on existing discussions can be helpful too.
 - Contribute code through a [pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests). This is generally more involved than creating an issue. You can [fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) a repository on GitHub, clone your fork, create a new branch, make some changes (e.g. fix a bug or implement a feature), push the branch, and then [create a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request). After this, there will generally be some back-and-forth with the project maintainers, who will give you feedback on your patch. Finally, if all goes well, your patch will be merged into the upstream repository. Often times, larger projects will have a contributing guide, tag beginner-friendly issues, and some even have mentorship programs to help first-time contributors become familiar with the project.
+
+## Lecture 11: Q&A
+
+> Create Time: 2023.07.08   Update Time:2023.07.08
+
+I don't note anything about this lecture except of adding something in previous notes. But I highly recommend this lecture!
