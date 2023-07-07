@@ -503,7 +503,7 @@ In use, once the server knows the client’s public key (stored in the `.ssh/aut
 
 ### Keyboard Remapping
 
-For many Vim or Emacs users, I think they remap the Caps Lock to Escape or Ctrl. So do I. But I get a very smart remapping here: **Caps Lock is remapped to Escape if you tap it quickly and to Ctrl if you hold it**. I think it's very good, because there's almost nothing that needs tap Ctrl quickly.
+For many Vim or Emacs users, I think they remap the Caps Lock to Escape or Ctrl. So do I. But I get a very smart remapping here: *Caps Lock is remapped to Escape if you tap it quickly and to Ctrl if you hold it*. I think it's very good, because there's almost nothing that needs tap Ctrl quickly.
 
 ### Daemons
 
@@ -511,3 +511,81 @@ Most computers have a series of processes that are always running in the backgro
 
 Also, if you just want to run some program with a given frequency there is no need to build a custom daemon, you can use [`cron`](https://www.man7.org/linux/man-pages/man8/cron.8.html), a daemon your system already runs to perform scheduled tasks. (Copied from lecture notes.) And if you just want to execute something simple and want to config a user daemon, you also can use cron. `@reboot` can config a job for executing once when system starts.
 
+### FUSE
+
+[FUSE](https://en.wikipedia.org/wiki/Filesystem_in_Userspace) (Filesystem in User Space) allows filesystems to be implemented by a user program. Users can run user space code for filesystem calls and then bridges the necessary calls to the kernel interfaces by FUSE. I'm using [rclone](https://rclone.org/commands/rclone_mount/) for support for my personal server and I don't know well about FUSE in fact. I think it's very useful to learn abou filesystem and FUSE. There're some encryption applications with FUSE filesystem, e.g., [gocryptfs](https://nuetzlich.net/gocryptfs/).
+
+### Backup
+
+I think the core ideas about backup are **versioning, deduplication and security**.
+
+Obviously, a copy of the data *in the same disk* is  not backup because it can not protect your data if your disk is broken. And synchronization solutions (e.g., Dropbox, Google Drive, RAID) are not backups, which I didn't know. The reason of that is that *when data is erased or corrupted they propagate the change*. 
+
+Versioning backups ensure that you can *access your history of changes and efficiently recover files*. Efficient backup solutions use *data deduplication to only store incremental changes and reduce the storage overhead*. Regarding security, you should ask yourself what someone would need to know/have in order to read your data and, more importantly, to delete all your data and associated backups. Lastly, blindly trusting backups is a terrible idea and you should verify regularly that you can use them to recover data.
+
+> I think of the TimeMachine. I didn't care about the applications/features like it, but now, I think I need to spend some time to learn about backup. I plan to study from [2019’s lecture notes on Backup](https://missing.csail.mit.edu/2019/backups)
+
+### APIs
+
+API is shorten from Application Program Interface. Most services online provide API so you can access the data programmatically by APIs. You may provide some token for authentication and [OAuth](https://www.oauth.com/) is a protocol we often use.
+
+### Common command-line flags/patterns
+
+> I just copy the lecture notes because it's enough concise.
+
+Command-line tools vary a lot, and you will often want to check out their `man` pages before using them. They often share some common features though that can be good to be aware of:
+
+- Most tools support some kind of `--help` flag to display brief usage instructions for the tool.
+- Many tools that can cause irrevocable change support the notion of a “dry run” in which they only print what they *would have done*, but do not actually perform the change. Similarly, they often have an “interactive” flag that will prompt you for each destructive action.
+- You can usually use `--version` or `-V` to have the program print its own version (handy for reporting bugs!).
+- Almost all tools have a `--verbose` or `-v` flag to produce more verbose output. You can usually include the flag multiple times (`-vvv`) to get *more* verbose output, which can be handy for debugging. Similarly, many tools have a `--quiet` flag for making it only print something on error.
+- In many tools, `-` in place of a file name means “standard input” or “standard output”, depending on the argument.
+- Possibly destructive tools are generally not recursive by default, but support a “recursive” flag (often `-r`) to make them recurse.
+- Sometimes, you want to pass something that looks like a flag as a normal argument. For example, imagine you wanted to remove a file called `-r`. Or you want to run one program “through” another, like `ssh machine foo`, and you want to pass a flag to the “inner” program (`foo`). *The special argument `--` makes a program stop processing flags and options (things starting with `-`) in what follows, letting you pass things that look like flags without them being interpreted* as such: `rm -- -r` or `ssh machine --for-ssh -- foo --for-foo`.
+
+### Window manager
+
+Most of users are using the floating window manager, which you can drag and drop windows with. There's another window manager: tiling window manager. In a tiling window manager, windows never overlap, and are instead arranged as tiles on your screen, sort of like panes in tmux.
+
+### VPN
+
+VPNs are all the rage these days, but it’s not clear that’s for [any good reason](https://gist.github.com/joepie91/5a9909939e6ce7d09e29). A VPN, in the best case, is *really* just a way for you to change your internet service provider as far as the internet is concerned. Some VPN providers are malicious (or at the very least opportunist), and will log all your traffic, and possibly sell information about it to third parties. Choosing a bad VPN provider is often worse than not using one in the first place. If you want to protect your traffic data, you'd better to try to encrypt them instead of using VPN. If you're an Internet user in China mainland, you'd better to trade off between convenience and security.
+
+### Markdown
+
+I write this not in Markdown and I really recommand it.
+
+### Hammerspoon
+
+[Hammerspoon](https://www.hammerspoon.org/) is a desktop automation framework for macOS. It lets you write Lua scripts that hook into operating system functionality, allowing you to interact with the keyboard/mouse, windows, displays, filesystem, and much more.
+
+> I think I like it! I will try it.
+
+#### Resources
+
+- [Getting Started with Hammerspoon](https://www.hammerspoon.org/go/)
+- [Sample configurations](https://github.com/Hammerspoon/hammerspoon/wiki/Sample-Configurations)
+- [Anish’s Hammerspoon config](https://github.com/anishathalye/dotfiles-local/tree/mac/hammerspoon)
+
+### Booting + Live USB
+
+When your machine boots up, before the operating system is loaded, the [BIOS](https://en.wikipedia.org/wiki/BIOS)/[UEFI](https://en.wikipedia.org/wiki/Unified_Extensible_Firmware_Interface) initializes the system. During this process, you can press a specific key combination to configure this layer of software. You can configure all sorts of hardware-related settings in the BIOS menu. You can also enter the boot menu to boot from an alternate device instead of your hard drive.
+
+[Live USBs](https://en.wikipedia.org/wiki/Live_USB) are USB flash drives containing an operating system. You can create one of these by downloading an operating system and burning it to the flash drive.
+
+### Virtualization
+
+[Virtual machines](https://en.wikipedia.org/wiki/Virtual_machine) and similar tools like containers let you emulate a whole computer system, including the operating system. This can be useful for creating an isolated environment for testing, development, or exploration.
+
+[Vagrant](https://www.vagrantup.com/) is a tool that lets you describe machine configurations (operating system, services, packages, etc.) in code, and then instantiate VMs with a simple `vagrant up`. [Docker](https://www.docker.com/) is conceptually similar but it uses containers instead. (I like Vagrant after Anish shows the demo)
+
+### Notebook programming
+
+[Notebook programming environments](https://en.wikipedia.org/wiki/Notebook_interface) can be really handy for doing certain types of interactive or exploratory development. Perhaps the most popular notebook programming environment today is [Jupyter](https://jupyter.org/), for Python (and several other languages). [Wolfram Mathematica](https://www.wolfram.com/mathematica/) is another notebook programming environment that’s great for doing math-oriented programming.
+
+### Github
+
+[GitHub](https://github.com/) is one of the most popular platforms for open-source software development. It’s easy to get started contributing to open-source to help improve the tools that you use every day. There are two primary ways in which people contribute to projects on GitHub:
+
+- Creating an [issue](https://help.github.com/en/github/managing-your-work-on-github/creating-an-issue). This can be used to report bugs or request a new feature. Neither of these involves reading or writing code, so it can be pretty lightweight to do. High-quality bug reports can be extremely valuable to developers. Commenting on existing discussions can be helpful too.
+- Contribute code through a [pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests). This is generally more involved than creating an issue. You can [fork](https://help.github.com/en/github/getting-started-with-github/fork-a-repo) a repository on GitHub, clone your fork, create a new branch, make some changes (e.g. fix a bug or implement a feature), push the branch, and then [create a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request). After this, there will generally be some back-and-forth with the project maintainers, who will give you feedback on your patch. Finally, if all goes well, your patch will be merged into the upstream repository. Often times, larger projects will have a contributing guide, tag beginner-friendly issues, and some even have mentorship programs to help first-time contributors become familiar with the project.
