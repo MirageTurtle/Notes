@@ -9,6 +9,7 @@ Wish me luck!
 ## Lists
 
 - [x] The Missing Semester of Your CS Education
+- [ ] Android Reverse Engineering
 - [ ] MIT 6.S081: Operating System Engineering
 - [ ] Stanford CS144: Computer Network
 - [ ] UCB CS161: Computer Security
