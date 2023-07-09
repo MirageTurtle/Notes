@@ -1,7 +1,5 @@
 # The Missing Semester of Your CS Education
 
-> 
-
 ## Lecture 1: Course overview + the shell
 
 > Create Time: 2023.06.23   Update Time:2023.06.23
