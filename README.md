@@ -8,10 +8,17 @@ Wish me luck!
 
 ## Lists
 
+### Courses and Lectures
+
 - [x] The Missing Semester of Your CS Education
-- [ ] Android Reverse Engineering
+- [ ] CMU CS15213: Introduction to Computer Systems
 - [ ] MIT 6.S081: Operating System Engineering
 - [ ] Stanford CS144: Computer Network
 - [ ] UCB CS161: Computer Security
 - [ ] ASU CSE365: Introduction to Cybersecurity
 - [ ] ASU CSE466: Computer Systems Security
+
+### Others
+
+- [ ] CVE Vulnerability resurfaces
+- [ ] Android Reverse Engineering
