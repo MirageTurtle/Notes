@@ -1,8 +1,10 @@
-# Intro to Computer Systems
+# Introduction to Computer Systems
 
 Textbook: [Computer Systems: A Programmer's Perspective, Third Edition](http://csapp.cs.cmu.edu), and David suggests that a really good strategy for studying and preparing for this course would be to read each chapter *three times*.
 
-## Lecture 1: Course Overview
+Class web page: [http://www.cs.cmu.edu/~213](http://www.cs.cmu.edu/~213)
+
+## Lecture 1: Course Overviewn
 
 > Create Time: 2023.07.11  Update Time: 2023.07.11
 
