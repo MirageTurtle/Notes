@@ -100,3 +100,33 @@ They need to get data in and out, and they communicate with each other over netw
 ### Course Perspective
 
 A programmer's perspective, and it means let you, as a person who sits in front of a computer screen typeing code, know about the machine you're typing code for in order to be effective at doing it, as spposed to somebody who some day goes to be designing and building the actual machine itself.
+
+## Lecture 2 Bits, Bytes and Integers
+
+> I'll going to pass through the part of base 2 number representatoin.
+
+### Bits and bytes
+
+- Everything is bits, and each bit is 0 or 1. This is because of the electronic implementation.
+- We usually group collections of 4bits at a time and then represent that in base 16 which is known as hexademical representatoin.
+- And a byte means 8 bits.
+- When they say it's a 64-bit machine, what they really mean is that the addresses are 64-bit values or 8-byte values.
+
+#### Boolean algebra
+
+- `A&B = 1` when both A=1 and B=1
+- `A|B = 1` when either A=1 and B=1
+- `~A = 1` when A=0
+- `A^B=1` when either A=1 or B=1, but not both
+
+#### Shift operations
+
+- Left shift `x << y`: shift bit-vector x left y positions
+  - Throw away extra bits on left
+  - Fill with 0's on right
+- Right shift `x >> y`: shift bit-vector x right y positions
+  - Throw away extra bits on right
+  - Logical shift: fill with 0's on left
+  - Arithmetic shift: replicate most significant bit on left
+- Undefined behavior
+  - shift amount < 0 or >= word size
