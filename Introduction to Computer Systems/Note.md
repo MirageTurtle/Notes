@@ -4,6 +4,8 @@ Textbook: [Computer Systems: A Programmer's Perspective, Third Edition](http://c
 
 Class web page: [http://www.cs.cmu.edu/~213](http://www.cs.cmu.edu/~213)
 
+I want to note all the thing when I take the classes, but I couldn't. So I just note something I think that's very interesting or very important. And I will enrich them when I read the textbook. And, I really recommand you all to take the classes!
+
 ## Lecture 1: Course Overviewn
 
 > Create Time: 2023.07.11  Update Time: 2023.07.11
@@ -103,9 +105,11 @@ A programmer's perspective, and it means let you, as a person who sits in front 
 
 ## Lecture 2 Bits, Bytes and Integers
 
+>  Create Time: 2023.07.12  Update Time: 2023.07.13
+
 > I'll going to pass through the part of base 2 number representatoin.
 
-### Bits and bytes
+### Bits and Bytes
 
 - Everything is bits, and each bit is 0 or 1. This is because of the electronic implementation.
 - We usually group collections of 4bits at a time and then represent that in base 16 which is known as hexademical representatoin.
@@ -130,3 +134,47 @@ A programmer's perspective, and it means let you, as a person who sits in front 
   - Arithmetic shift: replicate most significant bit on left
 - Undefined behavior
   - shift amount < 0 or >= word size
+	- On most machine, you'll get whatever x is.
+
+### Numer Representation
+
+#### Encoding integers
+
+Here's one interesting idea about how to compute signed number with two's complement. When I took my C programming course in my freshman year, I got when I got a bit pattern, such as `1010`, and the sign bit is `1`, so I needed to ignore the sign bit, and bitwise negated the number, then I got `101` which ignored the sign bit, and it means 5 based 10, finally, I could plus 1 on 5 and add the negative sign and I got the correct number `-6`. But, here, Randal tells, **for signed number, the sign bit is negative. Only this thing, and there's no other differences between unsigned numbers and signed number.** For bit pattern `1010`, you can use $1\times2^3+0\times2^2+1\times2^1+0\times2^0=10$ for unsigned number, and $1\times(-2^3)+0\times2^2+1\times2^1+0\times2^0=-6$. You can find that my old method is equivalent to this one, but the latter is so exquisite!
+
+#### Ranges of a bit pattern with w bits
+
+- Unsigned values: $UMin=0(00..00)$ and $UMax=2^w-1(11..11)$
+- Two's complement values: $TMin=-2^{w-1}(100..00)$ and $TMax=2^{w-1}-1(011..11)$
+
+##### Observation
+
+- $|TMax|=|TMin|-1$
+- $|UMax|=2\times|TMax|+1$
+
+#### Mapping between signed & unsigned
+
+You can find the mapping rule easily: when the highest bit is 0, they represent the same number, and when the highest bit is 1, their difference is $2^w$. And the mapping is unique.
+
+#### Signed & unsigned in C
+
+- Constants by default are considered to be signed integers.
+- If there is a mix of unsigned and signed in single expression, *signed values implicitly cast to unsigned*.
+
+### Expanding and Truncating
+
+#### Sign extension
+
+Given $w$-bit signed integer $x$, and now you want to convert it to $w+k$-bit integer with same value. You should just make $k$ copies of the sign bit.
+
+#### Expanding
+
+- Unsigned: zeros added
+- Signed: sign extension
+
+#### Truncating
+
+- Unsigned/Signed: bits are truncated
+- Result reinterpreted:
+  - Unsigned: mod operation
+  - Signed: similar to mod operation
