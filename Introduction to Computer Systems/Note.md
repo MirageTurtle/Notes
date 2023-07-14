@@ -103,7 +103,7 @@ They need to get data in and out, and they communicate with each other over netw
 
 A programmer's perspective, and it means let you, as a person who sits in front of a computer screen typeing code, know about the machine you're typing code for in order to be effective at doing it, as spposed to somebody who some day goes to be designing and building the actual machine itself.
 
-## Lecture 2 Bits, Bytes and Integers
+## Lecture 2: Bits, Bytes and Integers 1
 
 >  Create Time: 2023.07.12  Update Time: 2023.07.13
 
@@ -140,7 +140,7 @@ A programmer's perspective, and it means let you, as a person who sits in front 
 
 #### Encoding integers
 
-Here's one interesting idea about how to compute signed number with two's complement. When I took my C programming course in my freshman year, I got when I got a bit pattern, such as `1010`, and the sign bit is `1`, so I needed to ignore the sign bit, and bitwise negated the number, then I got `101` which ignored the sign bit, and it means 5 based 10, finally, I could plus 1 on 5 and add the negative sign and I got the correct number `-6`. But, here, Randal tells, **for signed number, the sign bit is negative. Only this thing, and there's no other differences between unsigned numbers and signed number.** For bit pattern `1010`, you can use $1\times2^3+0\times2^2+1\times2^1+0\times2^0=10$ for unsigned number, and $1\times(-2^3)+0\times2^2+1\times2^1+0\times2^0=-6$. You can find that my old method is equivalent to this one, but the latter is so exquisite!
+Here's one interesting idea about how to compute signed number with two's complement. When I took my C programming course in my freshman year, I got when I got a bit pattern, such as `1010`, and the sign bit is `1`, so I needed to ignore the sign bit, and bitwise negated the number, then I got `101` which ignored the sign bit, and it means 5 based 10, finally, I could increment on 5 and add the negative sign and I got the correct number `-6`. But, here, Randal tells, **for signed number, the sign bit is negative. Only this thing, and there's no other differences between unsigned numbers and signed number.** For bit pattern `1010`, you can use $1\times2^3+0\times2^2+1\times2^1+0\times2^0=10$ for unsigned number, and $1\times(-2^3)+0\times2^2+1\times2^1+0\times2^0=-6$. You can find that my old method is equivalent to this one, but the latter is so exquisite!
 
 #### Ranges of a bit pattern with w bits
 
@@ -178,3 +178,28 @@ Given $w$-bit signed integer $x$, and now you want to convert it to $w+k$-bit in
 - Result reinterpreted:
   - Unsigned: mod operation
   - Signed: similar to mod operation
+
+## Lecture 3: Bits, Bytes and Integers 2
+
+>  Create Time: 2023.07.14  Update Time: 2023.07.14
+
+### Addition and Subtraction
+
+Add the two $w$-bit numbers and just truncate $w$ bits if need. You can try to understand it by something mod operation. And you can just do subtraction by doing addition with a negative number in two's complement. So **the additions in unsigned and two's complement have identical bit-level behavior**, which is the reason two's complement is the most popular pattern for signed numbers.
+
+You need to notice the **overflow**, which happens when the true result is $w+1$ bits and trucated.
+
+### Multiplication
+
+As the same as addition, you just truncate $w$ bits if you need. And so does the overflow.
+
+### Power-of-2 Multiply and Divide with Shift
+
+- $u << k$ gives $u * 2^k$
+
+- $u >> k$ gives $\lfloor u / 2^k \rfloor$
+  - For signed number, use arithmetic shift. In C there's no fixed requirement for the type of shift, but on most machines, it will be arithmetic shift.
+
+### Negate
+
+Standard way: complement and increment. (The way my teacher teached, but I think core of the two's complement should not be this. This is just a way to compute the nagative number.)
