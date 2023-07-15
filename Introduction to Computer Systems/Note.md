@@ -4,7 +4,7 @@ Textbook: [Computer Systems: A Programmer's Perspective, Third Edition](http://c
 
 Class web page: [http://www.cs.cmu.edu/~213](http://www.cs.cmu.edu/~213)
 
-I want to note all the thing when I take the classes, but I couldn't. So I just note something I think that's very interesting or very important. And I will enrich them when I read the textbook. And, I really recommand you all to take the classes!
+I want to note all the thing when I take the classes, but I couldn't. So I just note something I think that's very interesting or very important. And I will enrich them when I read the textbook. And, I really recommend you all to take the classes!
 
 ## Lecture 1: Course Overviewn
 
@@ -181,25 +181,71 @@ Given $w$-bit signed integer $x$, and now you want to convert it to $w+k$-bit in
 
 ## Lecture 3: Bits, Bytes and Integers 2
 
->  Create Time: 2023.07.14  Update Time: 2023.07.14
+>  Create Time: 2023.07.14  Update Time: 2023.07.15
 
-### Addition and Subtraction
+### Arithmetic Operations
+
+#### Addition and Subtraction
 
 Add the two $w$-bit numbers and just truncate $w$ bits if need. You can try to understand it by something mod operation. And you can just do subtraction by doing addition with a negative number in two's complement. So **the additions in unsigned and two's complement have identical bit-level behavior**, which is the reason two's complement is the most popular pattern for signed numbers.
 
 You need to notice the **overflow**, which happens when the true result is $w+1$ bits and trucated.
 
-### Multiplication
+#### Multiplication
 
 As the same as addition, you just truncate $w$ bits if you need. And so does the overflow.
 
-### Power-of-2 Multiply and Divide with Shift
+#### Power-of-2 Multiply and Divide with Shift
 
 - $u << k$ gives $u * 2^k$
 
 - $u >> k$ gives $\lfloor u / 2^k \rfloor$
   - For signed number, use arithmetic shift. In C there's no fixed requirement for the type of shift, but on most machines, it will be arithmetic shift.
 
-### Negate
+#### Negate
 
 Standard way: complement and increment. (The way my teacher teached, but I think core of the two's complement should not be this. This is just a way to compute the nagative number.)
+
+### Byte-Oriented Memory Organization
+
+In your mind, **the memory is just a big array of bytes** which is numbered from 0 up to some maximum number. In fact what happens is that the operation system only allows certain regions within that memory to be referenced, and if you try to access the other regions it will signal an error what they call *segmentation fault*.
+
+#### Machine Words
+
+There's no really fixed idea of what a word size is. But roughly speaking, the word size is the nominal size of integer-valued data and of addresses. When we talk about a 64-bit machine, what we mean is that it regularly and routinely manipulate 64-bit values and arithmetic operations and it has a pointers or the values of addresses are 64-bit. *Actually, the word size of a program is determined by the combination of the hardware and the compiler.*
+
+#### Addresses
+
+We group the memory into blocks of words, and we usually assume that the address of the word is the lowest value address in it.
+
+#### Byte Ordering
+
+How are the bytes within a multi-byte word ordered in memory? There's little endian and big endian. For little endian, the first byte in the word is the least significant byte and big endian does the opposite.
+
+- Big Endian: Sun, PPC Mac, Internet
+- Little Endian: x86, ARM processors running Android, iOS and Windows
+
+You can code to print byte representation of data:
+
+```C
+typedef unsigned char *pointer;
+
+void show_bytes(pointer start, size_t len)
+{
+    size_t i;
+    for(i = 0; i < len; i++)
+        printf("%p\t0x%.2x\n", start+i, start[i]);
+    printf("\n");
+    return;
+}
+```
+
+#### Representing Strings
+
+Different with numbers, byte ordering of strings in C is not an issue. This is because strings is represented by array of characters in C. But there're some tricky things for strings in C: each character encoded in ASCII format and string should be null-terminated.
+
+### Integers C puzzles
+
+> I recommend you try to figure them out following the class which can help you determine how well you're learning.
+
+Why `x & (x-1) != 0`?
