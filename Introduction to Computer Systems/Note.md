@@ -249,3 +249,47 @@ Different with numbers, byte ordering of strings in C is not an issue. This is b
 > I recommend you try to figure them out following the class which can help you determine how well you're learning.
 
 Why `x & (x-1) != 0`?
+
+## Lecture 4: Floating Point
+
+> Create Time: 2023.07.16  Update Time: 2023.07.16
+
+For fractional binary number representation, it's no different for bit pattern representation for integer numbers. But there's some limitation:
+
+- It can only exactly represent numbers of the form $x/2^k$, because other rational numbers have repeating bit representations
+- Just one setting of binary point within the $w$ bits, which means you must do some trade-off between number range and number precision. This is where the *floating* comes.
+
+### Floating Point Representation (IEEE standard)
+
+- Numerical Form: $(-1)^s * M * 2^E$
+  - Sign bit $s$ determines whether number is negative or positive
+  - Significand $M$ normally a fractional value in range [1.0, 2.0].
+  - Exponent $E$ weights value by power of two.
+- Encoding: s + exp + frac
+  - MSB(most significant bit) S is sign bit $s$
+  - exp field encodes $E$ but is not equal to $E$
+  - frac field encodes $M$ but is not equal to $M$
+- Precision options
+  - Single precision(32 bits): s(1 bit) + exp(8 bits) + frac(23 bits)
+  - Double precision(64 bits): s(1 bit) + exp(11 bits) + frac(52 bits)
+  - Extended precision(80 bits, Intel only, not-standard): s(1 bit) + exp(15 bits) + frac(63 or 64 bits)
+- Normalized values
+  - exp != 00..00 and exp != 11..11
+  - Exponent coded as a biased value: E = Exp - Bias
+    - Exp is the unsigned value of exp field
+    - Bias = $2^{k-1} - 1$, where $k$ is number of exponent bits
+  - Significand coded with implied leading 1: M = 1.xx..xx
+    - xx..xx: bits of frac field
+    - minimum when frac=00..00
+    - maximum when frac=11.11
+
+- Denormalized values (for some so small numbers closed to zero)
+  - exp = 00..00
+  - Exponent value: E = 1 - Bias instead of E = 0 - Bias
+  - Significand coded with implied leading 0: M = 0.xx..xx
+- Special values
+  - exp = 11..11
+  - frac = 00..00: representing infinity which comes when operations overflow.
+  - frac != 00..00: representing Not-a-Number(NaN) which comes when no numeric value can be determined.
+
+![visualization](./figures/floating_visualization.png)
