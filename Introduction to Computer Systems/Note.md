@@ -265,31 +265,103 @@ For fractional binary number representation, it's no different for bit pattern r
   - Sign bit $s$ determines whether number is negative or positive
   - Significand $M$ normally a fractional value in range [1.0, 2.0].
   - Exponent $E$ weights value by power of two.
-- Encoding: s + exp + frac
+- Encoding: `s` + `exp` + `frac`
   - MSB(most significant bit) S is sign bit $s$
   - exp field encodes $E$ but is not equal to $E$
   - frac field encodes $M$ but is not equal to $M$
 - Precision options
-  - Single precision(32 bits): s(1 bit) + exp(8 bits) + frac(23 bits)
-  - Double precision(64 bits): s(1 bit) + exp(11 bits) + frac(52 bits)
-  - Extended precision(80 bits, Intel only, not-standard): s(1 bit) + exp(15 bits) + frac(63 or 64 bits)
+  - Single precision(32 bits): `s`(1 bit) + `exp`(8 bits) + `frac`(23 bits)
+  - Double precision(64 bits): `s`(1 bit) + `exp`(11 bits) + `frac`(52 bits)
+  - Extended precision(80 bits, Intel only, not-standard): `s`(1 bit) + `exp`(15 bits) + `frac`(63 or 64 bits)
+
+#### Types
+
 - Normalized values
-  - exp != 00..00 and exp != 11..11
-  - Exponent coded as a biased value: E = Exp - Bias
-    - Exp is the unsigned value of exp field
-    - Bias = $2^{k-1} - 1$, where $k$ is number of exponent bits
-  - Significand coded with implied leading 1: M = 1.xx..xx
-    - xx..xx: bits of frac field
-    - minimum when frac=00..00
-    - maximum when frac=11.11
+  - `exp` != 00..00 and `exp` != 11..11
+  - Exponent coded as a biased value: `E` = `Exp` - `Bias`
+    - `Exp` is the unsigned value of `exp` field
+    - `Bias` = $2^{k-1} - 1$, where $k$ is number of exponent bits
+  - Significand coded with implied leading 1: `M` = 1.xx..xx
+    - xx..xx: bits of `frac` field
+    - minimum when `frac`=00..00
+    - maximum when `frac`=11..11
 
 - Denormalized values (for some so small numbers closed to zero)
-  - exp = 00..00
-  - Exponent value: E = 1 - Bias instead of E = 0 - Bias
-  - Significand coded with implied leading 0: M = 0.xx..xx
+  - `exp` = 00..00
+  - Exponent value: `E` = 1 - `Bias` instead of `E` = 0 - `Bias`
+  - Significand coded with implied leading 0: `M` = 0.xx..xx
 - Special values
-  - exp = 11..11
-  - frac = 00..00: representing infinity which comes when operations overflow.
-  - frac != 00..00: representing Not-a-Number(NaN) which comes when no numeric value can be determined.
+  - `exp` = 11..11
+  - `frac` = 00..00: representing infinity which comes when operations overflow.
+  - `frac` != 00..00: representing Not-a-Number(NaN) which comes when no numeric value can be determined.
+
+#### Visualization and Example
+
+Here's the visualization of the floating number ranges and types.
 
 ![visualization](./figures/floating_visualization.png)
+
+Here's an example with `s`(1 bit) + `exp`(4 bits) + `frac`(3 bits).
+
+![Example](./figures/floating_example.png)
+
+#### Distribution
+
+You can find the distribution gets denser toward zero, like this:
+
+![distribution fig1](./figures/floating_distribution1.png)
+
+![distribution fig2](./figures/floating_distribution2.png)
+
+You can find that, when exp field increments, the spacing between two numbers will double. This is the reason the distribution gets denser toward zero.
+
+And at the same time, you can find the spacings of denormalized numbers and the set of the smallest normalized numbers are the same. This can be explained by the rules of denormalized number and normalized number. This is also a manifest for the nice smooth transition.
+
+#### Operations
+
+##### Basic idea
+
+- First compute exact result
+- Make it fit into desired precision
+  - Possibly overflow if exponent too large
+  - Possibly round to fit into `frac`
+
+##### Rounding
+
+- Towards zero
+- Round down (towards negative infinity)
+- Round up (towards positive infinity)
+- **Nearest even (default)**
+
+##### Multiplication
+
+$(-1)^s * M * 2^E = (-1)^{s_1} * M_1 * 2^{E_1} \times (-1)^{s_2} * M_2 * 2^{E-2}$
+
+- $s = s_1 + s_2 = s_1 \oplus s_2$
+- $M = M_1 \times M_2$
+- $E = E_1 + E_2$
+
+You need fixing:
+
+- If $M \geq 2$, by shifting $M$ right and incrementing $E$
+- If $E$ out of range, overflow to infinity.
+- Round M to fit `frac` precision.
+
+Compared to Commutative Ring, Floating Point multiplication is not associative and not distributed over addition.
+
+##### Addition
+
+You need to align the binary points by shifting before adding. Actually, the smaller `exp` is aligned to the bigger one. There may be overflow if the difference between two `exp`s is too big.
+
+Compared to Abelian Group, Floating Point addition is not associative because of overflow.
+
+#### Casting in C
+
+- From double/float to int:
+  - Just truncating fractional part
+  - Like rounding toward zero
+  - Not defined when out of range or NaN: generally sets to TMin
+- From int to double:
+  - Exact conversion, as long as the word size (normally 32) is less than 53 (the size of frac field of double floating point)
+- From int to float
+  - Will round according to rounding mode.
