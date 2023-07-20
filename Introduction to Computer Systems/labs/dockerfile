@@ -1,0 +1,10 @@
+From ubuntu:20.04
+MAINTAINER MirageTurtle
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=Asia/Shanghai
+ARG root_passwd=csapplab
+
+RUN /usr/bin/bash -c 'apt update && apt install -y build-essential gcc-multilib gdb openssh-server && sed -i -E /^#PermitRootLogin/s/^.*$/PermitRootLogin\ yes/ /etc/ssh/sshd_config && echo root:$root_passwd | chpasswd'
+
+CMD /usr/bin/bash -c 'service ssh start && tail -f /var/log/bootstrap.log'

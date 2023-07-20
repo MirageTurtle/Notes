@@ -1,0 +1,13 @@
+services:
+  csapp_lab:
+    build: .
+    environment:
+      - TZ=Asia/Shanghai
+      - PUID=${UID}
+      - PGID=${GID}
+      - UMASK=022
+    network_mode: bridge
+    ports:
+      - 8022:22
+    volumes:
+      - ./:/home/csapp/labs 
