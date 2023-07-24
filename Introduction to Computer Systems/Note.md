@@ -250,6 +250,13 @@ Different with numbers, byte ordering of strings in C is not an issue. This is b
 
 Why `x & (x-1) != 0`?
 
+### Extented Reading
+
+- [A weird question for Tmax(0x7fffffff), why (!x) == x?](https://stackoverflow.com/questions/62534011/a-weird-question-for-tmax0x7fffffff-why-x-x)
+
+- [Why is unsigned integer overflow defined behavior but signed integer overflow isn't?](https://stackoverflow.com/questions/18195715/why-is-unsigned-integer-overflow-defined-behavior-but-signed-integer-overflow-is)
+
+
 ## Lecture 4: Floating Point
 
 > Create Time: 2023.07.16  Update Time: 2023.07.16
