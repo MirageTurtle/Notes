@@ -168,8 +168,29 @@ int isTmax(int x) {
   /*
    * Tmax == ~Tmin
    * x - Tmax = x + (-Tmax) = x + (~Tmax + 1) = x + Tmin + 1
+   * But Tmin == 0x1 << 31, which uses the forbidden op <<.
    */
-  return !(x + ((0x1 << 31) | 0x1));
+  /* return !(x + ((0x1 << 31) | 0x1)); */
+
+  /*
+   * Tmin = Tmax + 1
+   * ~Tmin + 1 = Tmin => ~Tmin + 1 - Tmin = 0 => ~Tmin + 1 + ~Tmin + 1 = 0
+   * => Tmax + 1 + Tmax + 1 = 0
+   * If z + z = 0, then z = 0 or z = Tmin.
+   * If z = Tmin, then z - 1 = Tmax, i.e., (Tmax + 1) << 1 = 0
+   * If z = 0, then z - 1 = -1 (0xFFFFFFFF), i.e. (0xFFFFFFFF + 1) << 1 = 0
+   */
+  
+  /* printf("%x\n", x + x + 2); */
+  /* printf("%x\n", x + 1 + x + 1); */
+  /* printf("%x\n", !(x + x + 2)); */
+  /* printf("%x\n", !(x + 1 + x + 1)); */
+
+  /* Error, caused by integer overflow, which is an undefined behavior.*/
+  /* return (!(x + x + 2)) & (!!(x + 1)); */
+
+  /* You must use x + 1 + x + 1 instead of x + x + 2. */
+  return (!(x + 1 + x + 1)) & (!!(x + 1));
 }
 /* 
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
@@ -215,7 +236,7 @@ int isAsciiDigit(int x) {
    * x >= 0x30 => x - 0x30 >= 0 => !((x - 0x30) >> 31)
    * x <= 0x39 => 0x39 - x >= 0 => !((0x39 - x) >> 31)
    */
-  return (!((x + ~0x30 + 1) >> 31) & !((0x39 + ~x + 1) >> 31));
+  return (!((x + ~0x30 + 1) >> 31)) & (!((0x39 + ~x + 1) >> 31));
 }
 /* 
  * conditional - same as x ? y : z 
@@ -225,7 +246,22 @@ int isAsciiDigit(int x) {
  *   Rating: 3
  */
 int conditional(int x, int y, int z) {
-  return 2;
+  /*
+   * If x is 0, then y, i.e. y & 0x00000000 | z & 0xFFFFFFFF
+   * Else, then z, i.e. y & 0xFFFFFFFF | z & 0x00000000
+   * x == 0 => !x == 1, !!x == 0 => !x - 1 == 0,  ~!x + 1 / !!x - 1
+   * x != 0 => !x == 0, !!x == 1 => !x - 1 == -1, ~!x + 1 / !!x - 1
+   * I think the most interesting part of this function is that
+   * when I want to get 0xFFFFFFFF from 0x0, I first think of ~
+   * instead of minus op. Actually, if I think 0xFFFFFFFF as -1, I
+   * may think about minus op quickly.
+   */
+  /* return ((y & (!x + ~0x1 + 1)) | (z & (!!x + ~0x1 + 1))); */
+  /*
+   * If you want to use less ops, you may find that:
+   * !!x - 1 == ~!x + 1
+   */
+  return (y & (!x + ~0x1 + 1)) | (z & (~!x + 1));
 }
 /* 
  * isLessOrEqual - if x <= y  then return 1, else return 0 
@@ -237,8 +273,28 @@ int conditional(int x, int y, int z) {
 int isLessOrEqual(int x, int y) {
   /*
    * x <= y => y - x >= 0 => !((y - x) >> 31)
+   * Fail when overflow!
    */
-  return (!((y + ~x + 1) >> 31));
+  /* return (!((y + ~x + 1) >> 31)); */
+  /*
+   * Consider about sign
+   * sign = z >> 31, if z is positive, sign is 0x0, if z is negative, sign is 0xFFFFFFFF
+   * so for (x >> 31) ^ (y >> 31), 0 means same signs, and 0xFFFFFFFF means different signs.
+   * and then, for ((x >> 31) ^ (y >> 31)) + 1, 1 means same signs, 0 means different signs.
+   *
+   * We can use variables for less ops.
+   */
+  int sign_x = x >> 31;
+  int sign_y = y >> 31;
+  int same_sign = (sign_x ^ sign_y) + 1;
+  return (same_sign & !((y + ~x + 1) >> 31)) | (!same_sign & sign_x);
+
+  /*
+   * Besides my own solution, I get another solution from internet. Same number of ops,
+   but I think it's puzzling.
+   */
+  /* int sign = sign_x + sign_y; */
+  /* return (sign & (sign_x & 1) | ((~sign) & !((y + ~x + 1) >> 31))); */
 }
 //4
 /* 
@@ -250,7 +306,22 @@ int isLessOrEqual(int x, int y) {
  *   Rating: 4 
  */
 int logicalNeg(int x) {
-  return 2;
+  /*
+   * If x is 0, return 1, else return 0.
+   */
+  /* x = (x >> 16) | x; */
+  /* x = (x >> 8) | x; */
+  /* x = (x >> 4) | x; */
+  /* x = (x >> 2) | x; */
+  /* x = (x >> 1) | x; */
+  /* return ~x & 0x1; */
+
+  /*
+   * I get a interesting solution from internet, and its dependency is that
+   * only when x = 0 or x = 0x80000000, x == -x. And we can distinct them
+   * with their MSB.
+   */
+  return ((~(~x + 1) & ~x) >> 31) & 0x1;
 }
 /* howManyBits - return the minimum number of bits required to represent x in
  *             two's complement
