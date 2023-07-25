@@ -1,8 +1,8 @@
-/* 
- * CS:APP Data Lab 
- * 
+/*
+ * CS:APP Data Lab
+ *
  * <Please put your name and userid here>
- * 
+ *
  * bits.c - Source file with your solutions to the Lab.
  *          This is the file you will hand in to your instructor.
  *
@@ -10,7 +10,7 @@
  * compiler. You can still use printf for debugging without including
  * <stdio.h>, although you might get a compiler warning. In general,
  * it's not good practice to ignore compiler warnings, but in this
- * case it's OK.  
+ * case it's OK.
  */
 
 #if 0
@@ -129,11 +129,10 @@ NOTES:
  *      the correct answers.
  */
 
-
 #endif
-//1
-/* 
- * bitXor - x^y using only ~ and & 
+// 1
+/*
+ * bitXor - x^y using only ~ and &
  *   Example: bitXor(4, 5) = 1
  *   Legal ops: ~ &
  *   Max ops: 14
@@ -144,10 +143,10 @@ int bitXor(int x, int y) {
    * a ^ b => (~a & b) | (a & ~b)
    * a | b => ~(~a & ~b)
    */
-  return ~(~((~x & y)) & ~((x & ~y)));
+  return ~((~(~x & y)) & (~(x & ~y)));
 }
-/* 
- * tmin - return minimum two's complement integer 
+/*
+ * tmin - return minimum two's complement integer
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 4
  *   Rating: 1
@@ -156,10 +155,10 @@ int tmin(void) {
   /* 0x80000000 */
   return 0x1 << 31;
 }
-//2
+// 2
 /*
  * isTmax - returns 1 if x is the maximum, two's complement number,
- *     and 0 otherwise 
+ *     and 0 otherwise
  *   Legal ops: ! ~ & ^ | +
  *   Max ops: 10
  *   Rating: 2
@@ -170,7 +169,7 @@ int isTmax(int x) {
    * x - Tmax = x + (-Tmax) = x + (~Tmax + 1) = x + Tmin + 1
    * But Tmin == 0x1 << 31, which uses the forbidden op <<.
    */
-  /* return !(x + ((0x1 << 31) | 0x1)); */
+  // return !(x + ((0x1 << 31) | 0x1));
 
   /*
    * Tmin = Tmax + 1
@@ -180,19 +179,19 @@ int isTmax(int x) {
    * If z = Tmin, then z - 1 = Tmax, i.e., (Tmax + 1) << 1 = 0
    * If z = 0, then z - 1 = -1 (0xFFFFFFFF), i.e. (0xFFFFFFFF + 1) << 1 = 0
    */
-  
-  /* printf("%x\n", x + x + 2); */
-  /* printf("%x\n", x + 1 + x + 1); */
-  /* printf("%x\n", !(x + x + 2)); */
-  /* printf("%x\n", !(x + 1 + x + 1)); */
+
+  // printf("%x\n", x + x + 2);
+  // printf("%x\n", x + 1 + x + 1);
+  // printf("%x\n", !(x + x + 2));
+  // printf("%x\n", !(x + 1 + x + 1));
 
   /* Error, caused by integer overflow, which is an undefined behavior.*/
-  /* return (!(x + x + 2)) & (!!(x + 1)); */
+  // return (!(x + x + 2)) & (!!(x + 1));
 
   /* You must use x + 1 + x + 1 instead of x + x + 2. */
   return (!(x + 1 + x + 1)) & (!!(x + 1));
 }
-/* 
+/*
  * allOddBits - return 1 if all odd-numbered bits in word set to 1
  *   Examples allOddBits(0xFFFFFFFD) = 0, allOddBits(0xAAAAAAAA) = 1
  *   Legal ops: ! ~ & ^ | + << >>
@@ -205,14 +204,14 @@ int allOddBits(int x) {
    * y <= 0xAAAAAAAA: y = (0xAA << 24) | (0xAA << 16) | (0xAA << 8) | 0xAA
    */
   int y;
-  /* y = (0xAA << 24) | (0xAA << 16) | (0xAA << 8) | 0xAA; */
+  // y = (0xAA << 24) | (0xAA << 16) | (0xAA << 8) | 0xAA;
   // Less ops
   y = (0xAA << 8) | 0xAA;
   y = (y << 16) | y;
   return !((x & y) + ~y + 1);
 }
-/* 
- * negate - return -x 
+/*
+ * negate - return -x
  *   Example: negate(1) = -1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 5
@@ -221,11 +220,10 @@ int allOddBits(int x) {
 int negate(int x) {
   return ~x + 1;
 }
-//3
-/* 
- * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0' to '9')
- *   Example: isAsciiDigit(0x35) = 1.
- *            isAsciiDigit(0x3a) = 0.
+// 3
+/*
+ * isAsciiDigit - return 1 if 0x30 <= x <= 0x39 (ASCII codes for characters '0'
+ * to '9') Example: isAsciiDigit(0x35) = 1. isAsciiDigit(0x3a) = 0.
  *            isAsciiDigit(0x05) = 0.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 15
@@ -238,8 +236,8 @@ int isAsciiDigit(int x) {
    */
   return (!((x + ~0x30 + 1) >> 31)) & (!((0x39 + ~x + 1) >> 31));
 }
-/* 
- * conditional - same as x ? y : z 
+/*
+ * conditional - same as x ? y : z
  *   Example: conditional(2,4,5) = 4
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 16
@@ -256,15 +254,15 @@ int conditional(int x, int y, int z) {
    * instead of minus op. Actually, if I think 0xFFFFFFFF as -1, I
    * may think about minus op quickly.
    */
-  /* return ((y & (!x + ~0x1 + 1)) | (z & (!!x + ~0x1 + 1))); */
+  // return ((y & (!x + ~0x1 + 1)) | (z & (!!x + ~0x1 + 1)));
   /*
    * If you want to use less ops, you may find that:
    * !!x - 1 == ~!x + 1
    */
   return (y & (!x + ~0x1 + 1)) | (z & (~!x + 1));
 }
-/* 
- * isLessOrEqual - if x <= y  then return 1, else return 0 
+/*
+ * isLessOrEqual - if x <= y  then return 1, else return 0
  *   Example: isLessOrEqual(4,5) = 1.
  *   Legal ops: ! ~ & ^ | + << >>
  *   Max ops: 24
@@ -275,12 +273,13 @@ int isLessOrEqual(int x, int y) {
    * x <= y => y - x >= 0 => !((y - x) >> 31)
    * Fail when overflow!
    */
-  /* return (!((y + ~x + 1) >> 31)); */
+  // return (!((y + ~x + 1) >> 31));
   /*
    * Consider about sign
-   * sign = z >> 31, if z is positive, sign is 0x0, if z is negative, sign is 0xFFFFFFFF
-   * so for (x >> 31) ^ (y >> 31), 0 means same signs, and 0xFFFFFFFF means different signs.
-   * and then, for ((x >> 31) ^ (y >> 31)) + 1, 1 means same signs, 0 means different signs.
+   * sign = z >> 31, if z is positive, sign is 0x0, if z is negative, sign is
+   * 0xFFFFFFFF so for (x >> 31) ^ (y >> 31), 0 means same signs, and 0xFFFFFFFF
+   * means different signs. and then, for ((x >> 31) ^ (y >> 31)) + 1, 1 means
+   * same signs, 0 means different signs.
    *
    * We can use variables for less ops.
    */
@@ -290,31 +289,31 @@ int isLessOrEqual(int x, int y) {
   return (same_sign & !((y + ~x + 1) >> 31)) | (!same_sign & sign_x);
 
   /*
-   * Besides my own solution, I get another solution from internet. Same number of ops,
-   but I think it's puzzling.
+   * Besides my own solution, I get another solution from internet. Same number
+   of ops, but I think it's puzzling.
    */
-  /* int sign = sign_x + sign_y; */
-  /* return (sign & (sign_x & 1) | ((~sign) & !((y + ~x + 1) >> 31))); */
+  // int sign = sign_x + sign_y;
+  // return (sign & (sign_x & 1) | ((~sign) & !((y + ~x + 1) >> 31)));
 }
-//4
-/* 
- * logicalNeg - implement the ! operator, using all of 
+// 4
+/*
+ * logicalNeg - implement the ! operator, using all of
  *              the legal operators except !
  *   Examples: logicalNeg(3) = 0, logicalNeg(0) = 1
  *   Legal ops: ~ & ^ | + << >>
  *   Max ops: 12
- *   Rating: 4 
+ *   Rating: 4
  */
 int logicalNeg(int x) {
   /*
    * If x is 0, return 1, else return 0.
    */
-  /* x = (x >> 16) | x; */
-  /* x = (x >> 8) | x; */
-  /* x = (x >> 4) | x; */
-  /* x = (x >> 2) | x; */
-  /* x = (x >> 1) | x; */
-  /* return ~x & 0x1; */
+  // x = (x >> 16) | x;
+  // x = (x >> 8) | x;
+  // x = (x >> 4) | x;
+  // x = (x >> 2) | x;
+  // x = (x >> 1) | x;
+  // return ~x & 0x1;
 
   /*
    * I get a interesting solution from internet, and its dependency is that
@@ -336,10 +335,45 @@ int logicalNeg(int x) {
  *  Rating: 4
  */
 int howManyBits(int x) {
-  return 0;
+  /*
+   * If x >= 0, x = x
+   * Else, x = ~x
+   * And then, the return value is the first 1 bit position + 1.
+   * Binary search for the first 1 bit position.
+   */
+  int sign_x, y, h16, h8, h4, h2, h1;
+  sign_x = x >> 31;
+  x = (sign_x & ~x) | ((~!sign_x + 1) & x);
+
+  // 1 in the higher 16 bits
+  y = x >> 16;
+  h16 = !!y << 4;
+  x = x >> h16;
+
+  // 1 in the next higher 8 bits
+  y = x >> 8;
+  h8 = !!y << 3;
+  x = x >> h8;
+
+  // 1 in the next higher 4 bits
+  y = x >> 4;
+  h4 = !!y << 2;
+  x = x >> h4;
+
+  // 1 in the next higher 2 bits
+  y = x >> 2;
+  h2 = !!y << 1;
+  x = x >> h2;
+
+  // 1 in the next higher 1 bit
+  y = x >> 1;
+  h1 = !!y;
+  x = x >> h1;
+
+  return h16 + h8 + h4 + h2 + h1 + x + 1;
 }
-//float
-/* 
+// float
+/*
  * float_twice - Return bit-level equivalent of expression 2*f for
  *   floating point argument f.
  *   Both the argument and result are passed as unsigned int's, but
@@ -351,9 +385,33 @@ int howManyBits(int x) {
  *   Rating: 4
  */
 unsigned float_twice(unsigned uf) {
-  return 2;
+  unsigned s, exp, frac, s_mask, exp_mask, frac_mask;
+  s_mask = 0x1 << 31;
+  exp_mask = 0xFF << 23;
+  frac_mask = ~(s_mask | exp_mask);
+  s = uf & s_mask;
+  exp = uf & exp_mask;
+  frac = uf & frac_mask;
+  if (!exp) // exp == 0x00
+  {
+    /*
+     * We just need to compute frac * 2, and don't need to consider
+     * about overflow because of the briliant design of float
+     */
+    frac = frac << 1;
+  } else if (exp ^ exp_mask) // exp != 0xff
+  {
+    exp = exp + (0x1 << 23);
+    // if overflow
+    if (!(exp ^ exp_mask)) // if exp overflow to 0xff, the number overflow to infinity.
+    {
+      frac = 0x0;
+    }
+  }
+  // If exp == 0xff, we don't process anything.
+  return s | exp | frac;
 }
-/* 
+/*
  * float_i2f - Return bit-level equivalent of expression (float) x
  *   Result is returned as unsigned int, but
  *   it is to be interpreted as the bit-level representation of a
@@ -363,9 +421,86 @@ unsigned float_twice(unsigned uf) {
  *   Rating: 4
  */
 unsigned float_i2f(int x) {
-  return 2;
+  /*
+   * I use too much ops, so I try to reduce the count.
+   * During this, I find that it's likely ok that
+   * I use number larger than 0xFF.
+   */
+  unsigned s, exp, frac, s_mask, exp_mask, frac_mask, tmp, n, half, cut, cut_mask, flag;
+  // s_mask = 0x1 << 31;
+  // exp_mask = 0xFF << 23;
+  // frac_mask = ~(s_mask | exp_mask);
+  s_mask = 0x80000000;
+  exp_mask = 0x7F800000;
+  frac_mask = 0x7FFFFF;
+  s = x & s_mask;
+  if(!x)
+    {
+      return 0;
+    }
+  if(x == 0x80000000)
+    {
+      return 0xcf000000;
+    }
+  if (s) {
+    x = -x;
+  }
+  tmp = x;
+  n = -1;
+  while (tmp) {
+    tmp = tmp >> 1;
+    n = n + 1;
+  }
+  /* Remove the first 1 */
+  /* I commented this when I try to reduce the #ops, */
+  /* And I remove the hidden 1 of frac using frac_mask */
+  /* when I return result. */
+  // x = x ^ (0x1 << n);
+  exp = n + 127;
+  if(n > 23)
+    {
+      frac = (x >> (n - 23));
+      // cut_mask = (0u - 1) >> (55 - n);
+      cut_mask = 0xFFFFFFFF >> (55 - n);
+      half = (cut_mask >> 1) + 1;
+      // half = 0x1 << (n - 22);
+      cut = x & cut_mask;
+      /*
+       * Because `if` is not calculated into the op number,
+       * I'll use more `if` to replace `||` and `&&`.
+       */
+      // if(((cut == half) && (x & (cut_mask + 1))) || (cut > half))
+      // 	{
+      // 	  frac = (frac + 1) & frac_mask;
+      // 	  exp = exp + (!frac);
+      // 	}
+      flag = 0;
+      if(cut == half)
+	{
+	  if(x & (cut_mask + 1))
+	    {
+	      flag = 1;
+	    }
+	}
+      if(cut > half)
+	{
+	  flag = 1;
+	}
+      if(flag)
+	{
+	  frac = (frac + 1) & frac_mask;
+	  exp = exp + (!frac);
+	}
+    }
+  else
+    {
+      frac = (x << (23 - n));
+    }
+  
+  // return s | (exp << 23) | frac;
+  return s | (exp << 23) | (frac & frac_mask);
 }
-/* 
+/*
  * float_f2i - Return bit-level equivalent of expression (int) f
  *   for floating point argument f.
  *   Argument is passed as unsigned int, but
@@ -378,5 +513,27 @@ unsigned float_i2f(int x) {
  *   Rating: 4
  */
 int float_f2i(unsigned uf) {
-  return 2;
+  unsigned s, frac, out_of_range;
+  int exp;
+  s = uf >> 31;
+  exp = ((uf << 1) >> 24) - 127;
+  frac = ((uf << 9) >> 9) | (0x1 << 23);
+  out_of_range = 0x1 << 31;
+  if (exp > 30) {
+    return out_of_range;
+  }
+  if (exp < 0) {
+    return 0;
+  }
+
+  if (exp >= 23) {
+    frac = frac << (exp - 23);
+  } else {
+    frac = frac >> (23 - exp);
+  }
+  if (s) {
+    // frac = ~frac + 1;
+    frac = -frac;
+  }
+  return frac;
 }
