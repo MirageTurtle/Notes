@@ -140,6 +140,12 @@ NOTES:
  */
 int bitXor(int x, int y) {
   /*
+   * IMPORTANT:
+   * bitXor can't pass the bddcheck tests, and can pass the btest test.
+   * Actually, when I test by bddcheck/check.pl at my working directory, it's OK.
+   * But when I test at the temp directory made by `driver.pl`, it fails.
+   */
+  /*
    * a ^ b => (~a & b) | (a & ~b)
    * a | b => ~(~a & ~b)
    */
