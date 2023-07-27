@@ -372,3 +372,62 @@ Compared to Abelian Group, Floating Point addition is not associative because of
   - Exact conversion, as long as the word size (normally 32) is less than 53 (the size of frac field of double floating point)
 - From int to float
   - Will round according to rounding mode.
+
+## Lecture 5: Machine-Level Programming I: Basics
+
+> Create Time: 2023.07.27  Update Time: 2023.07.27
+
+> Pass the stories of Intel, x86, IA64, CISC, RISC, and ARM in my note, but it's also interesting to listen.
+
+### C, assembly, machine code
+
+#### Definitions
+
+- Architecture (also ISA, Instruction Set Architecture): the parts of a processor design that one needs to understand or write assembly/machine code.
+- Microarchitecture: Implementation of the architecture.
+- Machine Code: the byte-level programs that a processor executes.
+- Assembly Code: A text representation of machine code.
+
+#### Machine/Assembly Code View
+
+- PC: Program counter, actually address of next instruction, which is called "RIP" for x86-64.
+- Register file: heavily used program data
+- Condition code: store status information about most recent arithmetic or logical operation for conditional branching.
+- Memory: Byte addressable array for code and user data.
+- NO cache from Code View, there's no instruction for cache. It's not visible to programmer.
+
+#### Turning C into object code
+
+Command: `gcc –Og p1.c p2.c -o p`, where `-O` means optimization, `g` means for debug (more readable), `-o` means output file.
+
+After *preprocessing*, which is something simple like string replacement, there's still three steps to turn C into object code:
+
+- Compile: from C programs to asm programs
+- Assemble: from asm programs to object programs
+- Link: from object programs and static libraries to executable program.
+
+There's some dynamic libraries, which is linked when executing the program.
+
+![Turning C into object code](./figures/machine_compiling.png)
+
+##### Compiling to Assembly
+
+Command: `gcc –Og -S sum.c`, where `-S` means stop after this step (compiling to assembly)
+
+##### Assembly Characteristics
+
+> I'm not clear about this part, and I'll update when I totally understand them.
+
+- Data Types
+- Operations
+
+##### Disassembling Object Code
+
+Command: `objdump -d executable_file`
+
+### Assembly Basics: Registers, operands, move
+
+#### Registers
+
+![Registers](./figures/machine_registers.png)
+
