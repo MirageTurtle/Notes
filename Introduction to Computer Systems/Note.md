@@ -375,7 +375,7 @@ Compared to Abelian Group, Floating Point addition is not associative because of
 
 ## Lecture 5: Machine-Level Programming I: Basics
 
-> Create Time: 2023.07.27  Update Time: 2023.07.27
+> Create Time: 2023.07.27  Update Time: 2023.07.28
 
 > Pass the stories of Intel, x86, IA64, CISC, RISC, and ARM in my note, but it's also interesting to listen.
 
