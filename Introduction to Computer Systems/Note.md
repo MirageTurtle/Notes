@@ -431,3 +431,41 @@ Command: `objdump -d executable_file`
 
 ![Registers](./figures/machine_registers.png)
 
+As this image shows, there's a special register, `%rsp`, which is stack pointer.
+
+#### Moving Data
+
+Command: `move source, dest`
+
+Operand Types: Immediate (Constant integer data, e.g., `$0x400`), Register (one of 16 integer registers, e.g., `%rax`) and Memory (8 consecutive bytes of memory at address given by register, e.g., `(%rax)`).
+
+Operand Combinations: `movq Imm, Reg`, `movq Imm, Mem`, `movq Reg, Reg`, `movq Reg Mem`, `move Mem Reg`. An Immediate is no meaning for a dest, and we can not do memory-memory transfer with a single instruction.
+
+#### Single Memory Addressing Mode
+
+- Normal: `(R)` is standing for `Mem[Reg[R]]`.
+- Displacement: `D(R)` is standing for `Mem[Reg[R] + D]`.
+
+#### Complete Memory Addressing Mode
+
+- Most Genral Form: `D(Rb, Ri, S)` is standing for `Mem[Reg[Rb] + S * Reg[Ri] + D]`
+  - D: Constant "displacement" 1, 2, or 4 bytes, omitting when D is 0.
+  - Rb: Base register, any of 16 integer registers.
+  - Ri: Index register, any of left 15 integer rigisters except for `%rsp`.
+  - S: Scale, 1, 2, 4, or 8, omitting when S is 1.
+
+### Arithmetic & logical operations
+
+#### Address Computation Instruction
+
+Command: `leaq source, dest`, where `source` is address mode expression, and `dest` is set to address denoted by expression.
+
+#### Some Arithmetic Operations
+
+##### Two Operand Instructions
+
+![Two Operand Instructions](./figures/machine_2op.png)
+
+##### One Operand Instructions
+
+![One Operand Instructions](./figures/machine_1op.png)
