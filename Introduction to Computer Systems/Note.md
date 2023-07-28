@@ -390,7 +390,7 @@ Compared to Abelian Group, Floating Point addition is not associative because of
 
 #### Machine/Assembly Code View
 
-- PC: Program counter, actually address of next instruction, which is called "RIP" for x86-64.
+- PC: Program counter, actually address of next instruction, which is called "RIP" (`%rip`) for x86-64.
 - Register file: heavily used program data
 - Condition code: store status information about most recent arithmetic or logical operation for conditional branching.
 - Memory: Byte addressable array for code and user data.
@@ -408,7 +408,7 @@ After *preprocessing*, which is something simple like string replacement, there'
 
 There's some dynamic libraries, which is linked when executing the program.
 
-![Turning C into object code](./figures/machine_compiling.png)
+![Turning C into object code](./figures/machine_basic_compiling.png)
 
 ##### Compiling to Assembly
 
@@ -429,7 +429,7 @@ Command: `objdump -d executable_file`
 
 #### Registers
 
-![Registers](./figures/machine_registers.png)
+![Registers](./figures/machine_basic_registers.png)
 
 As this image shows, there's a special register, `%rsp`, which is stack pointer.
 
@@ -464,8 +464,8 @@ Command: `leaq source, dest`, where `source` is address mode expression, and `de
 
 ##### Two Operand Instructions
 
-![Two Operand Instructions](./figures/machine_2op.png)
+![Two Operand Instructions](./figures/machine_basic_2op.png)
 
 ##### One Operand Instructions
 
-![One Operand Instructions](./figures/machine_1op.png)
+![One Operand Instructions](./figures/machine_basic_1op.png)
