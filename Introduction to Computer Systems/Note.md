@@ -469,3 +469,111 @@ Command: `leaq source, dest`, where `source` is address mode expression, and `de
 ##### One Operand Instructions
 
 ![One Operand Instructions](./figures/machine_basic_1op.png)
+
+## Lecture 6: Machine-Level Programming II: Control
+
+> Create Time: 2023.07.28  Update Time: 2023.07.28
+
+![Information about currently executing program](./figures/machine_control_information.png)
+
+### Condition codes
+
+They are some signle bit registers.
+
+- CF: Carry flag for unsigned, 1 if result carries out from the most significant bit (unsigned overflow).
+- ZF: Zero flag, 1 if the result is 0.
+- SF: Sign flag for signed, 1 if result is less than 0 as signed.
+- OF: Overflow flag for signed, if signed overflow (including positive overflow and negative overflow).
+
+#### Implicitly set
+
+- Arithmetic operations: It's something like side effect.
+- Compare: `cmpq src2, src1`, like computing `src1 - src2`
+- Test: `testq src2, src1`, like computing `src1 & src2`, and it's useful when `src1` and `src2` are the same.
+
+#### Explicitly set
+
+**SetX intructions**: set low-order byte of destination to 0 or 1 based on combinations of condition codes.
+
+| setX    | Condition         | Description               |
+| ------- | ----------------- | ------------------------- |
+| `sete`  | ZF                | Equal/Zero                |
+| `setne` | ~ZF               | Not Equal/Not Zero        |
+| `sets`  | SF                | Negative                  |
+| `setns` | ~SF               | Nonnegative               |
+| `setg`  | ~ (SF ^ OF) & ~ZF | Greater (Signed)          |
+| `setge` | ~ (SF ^ OF)       | Greater or Equal (Signed) |
+| `setl`  | (SF ^ OF)         | Less (Signed)             |
+| `setle` | (SF ^ OF) \| ZF   | Less or Equal (Signed)    |
+| `seta`  | ~CF & ~ZF         | Above (Unsigned)          |
+| `setb`  | CF                | Below (Unsigned)          |
+
+### Conditional branches
+
+Jumping with **JX instructions** (Jump to different part of code depending on condition codes.)
+
+| jX   | Condition         | Description               |
+| ---- | ----------------- | ------------------------- |
+| jmp  | 1                 | Unconditional             |
+| je   | ZF                | Equal / Zero              |
+| jne  | ~ZF               | Not Equal / Not Zero      |
+| js   | SF                | Negative                  |
+| jns  | ~SF               | Nonnegative               |
+| jg   | ~ (SF ^ OF) & ~ZF | Greater (Signed)          |
+| jge  | ~ (SF ^ OF)       | Greater or Equal (Signed) |
+| jl   | (SF ^ OF)         | Less (Signed)             |
+| jle  | (SF ^ OF) \| ZF   | Less or Equal (Signed)    |
+| ja   | ~CF & ~ZF         | Above (Unsigned)          |
+| jb   | CF                | Below (Unsigned)          |
+
+#### Conditional Branch Example
+
+```C
+long absdiff(long x, long y)
+{
+  long result;
+  if (x > y)
+	  result = x-y;
+  else
+  	result = y-x;
+  return result;
+}
+```
+
+##### Old Style
+
+Generation: `gcc –Og -S –fno-if-conversion control.c`, where `-fno-if-conversion` means do not use conditional move.
+
+```assembly
+absdiff:
+	cmpq		%rsi,	%rdi	# x:y
+	jle			.L4
+	movq		%rdi,	%rax
+	subq		%rsi,	%rax
+	ret
+.L4:			# x <= y
+	movq		%rsi,	%rax
+	subq		%rdi,	%rax
+	ret
+```
+
+##### Conditional move
+
+```assembly
+absdiff:
+	movq		%rdi,	%rax	# x
+	subq		%rsi,	%rax	# result = x - y
+	movq		%rsi,	%rdx	# y
+	subq		%rdi,	%rdx	# eval = y - x
+	cmpq		%rsi,	%rdi	# x:y
+	comvle	%rdx,	%rax	# if <=, result = eval
+	ret
+```
+
+You can find that, using conditional move can reduce conditional jump, which delays the pipeline.
+
+Conditional move is not always the best choice. You should know conditional move does the both computations, and decide which one is the real one before return. But sometimes, it might be a really bad idea to do both computations:
+
+- Expensive computations: `val = Test(x) ? Hard1(x) : Hard2(x);`
+- Risky computations: `val = p ? *p : 0;`
+- Computations with side effects: `val = x > 0 ? x *= 7 : x += 3;`
