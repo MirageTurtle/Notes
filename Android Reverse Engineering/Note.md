@@ -61,3 +61,14 @@ APK全称Android Package，本质是一个压缩文件。常见文件包括：
 - AndroidMainfest.xml文件：应用清单
 - classes.dex文件：java源码编译后生成的java字节码文件，是软件运行的主要逻辑
 - resources.arsc文件：编译后的二进制资源文件，是一个映射表，映射资源与id
+
+### 双开
+
+- 修改包名：让手机系统认为这是两个不同的APP，从而生成两个数据存储路径。
+- 修改Framework：对于有系统修改权限的厂商，可以修改Framework来实现双开，例如：小米自带多开。
+- 虚拟化技术：虚拟Framework层、虚拟文件系统、模拟Android对组件的管理、虚拟应用进程等一整套虚拟技术，将APK复制到虚拟空间中运行，例如平行空间。
+- 插件机制：利用反射替换，动态代理，hook了系统的大部分与system/server进程通信的函数，以此达到欺骗系统只有一个apk在运行的目的，例如：VirtualAPP。
+
+### 反编译工具
+
+MT管理器、NP管理器
