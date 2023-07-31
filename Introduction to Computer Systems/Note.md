@@ -472,7 +472,7 @@ Command: `leaq source, dest`, where `source` is address mode expression, and `de
 
 ## Lecture 6: Machine-Level Programming II: Control
 
-> Create Time: 2023.07.28  Update Time: 2023.07.28
+> Create Time: 2023.07.28  Update Time: 2023.07.31
 
 ![Information about currently executing program](./figures/machine_control_information.png)
 
@@ -577,3 +577,93 @@ Conditional move is not always the best choice. You should know conditional move
 - Expensive computations: `val = Test(x) ? Hard1(x) : Hard2(x);`
 - Risky computations: `val = p ? *p : 0;`
 - Computations with side effects: `val = x > 0 ? x *= 7 : x += 3;`
+
+### Loops
+
+#### Do-While
+
+Do-While loop is the most basic and the easiest loop format, although we rarely use it.
+
+**C Code**:
+
+```C
+do
+  Body
+while (Test);
+```
+
+**Goto Version**:
+
+```C
+loop:
+  Body
+  if (Test)
+    goto Loop
+```
+
+You can translate goto version to assembly directly.
+
+#### While
+
+**C Code**:
+
+```C
+while (Test)
+  body
+```
+
+**Goto Version 1 (Jump-to-middle translation)**:
+
+Optimization parameter: `-Og`
+
+```C
+goto Test;
+Loop:
+  Body
+Test:
+  if (Test)
+    goto Loop;
+```
+
+You can find that, this version just add `goto Test` part based on the goto version of do-while loop. It just fixes the difference between the two loop.
+
+**Goto Version 2 (Do-while translation)**:
+
+Optimization parameter: `-O1`
+
+```C
+if (!Test)
+  goto Done:
+Loop:
+	Body
+Test:
+	if (Test)
+    goto Loop;
+Done:
+```
+
+Actually, this one is only testing first by myself, and the other one is testing by `goto Test`. So why this one is the result by `-O1`? This is because that, at most time, we initialize before we do loop, and at most time, the initialized variables can pass the test. So when we use the corresponding assembly code of this goto version, the initial test can *be optimized away* by compiler.
+
+#### For
+
+**C Code**
+
+```C
+for (Init; Test; Update)
+  Body
+```
+
+**While Version**
+
+```C
+Init;
+while (Test) {
+  Body
+  Update;
+}
+```
+
+You can find the `-O1` optimization from:
+
+![Optimize away initial test](./figures/machine_control_optimize_away_test.png)
+
