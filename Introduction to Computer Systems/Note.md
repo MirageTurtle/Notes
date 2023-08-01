@@ -472,7 +472,7 @@ Command: `leaq source, dest`, where `source` is address mode expression, and `de
 
 ## Lecture 6: Machine-Level Programming II: Control
 
-> Create Time: 2023.07.28  Update Time: 2023.07.31
+> Create Time: 2023.07.28  Update Time: 2023.08.01
 
 ![Information about currently executing program](./figures/machine_control_information.png)
 
@@ -666,4 +666,16 @@ while (Test) {
 You can find the `-O1` optimization from:
 
 ![Optimize away initial test](./figures/machine_control_optimize_away_test.png)
+
+### Switch Statements
+
+The compiler would build a jump table, where every cases map a code block. This helps `switch-case` statement do in *O(1)* time. The slides about here is all important I think, so I recommend you to read the slides, and I'm not going to copy them all here.
+
+![Switch Statement Example in High Level](./figures/machine_control_switch.png)
+
+But here's some tricky things when compiler compiles `switch-case` statements:
+
+- In the example, the all cases are `1, 2, 3, 5, 6`. So the compiler will compare `x` with 6 **in unsigned format**. If `x > 6`, which means `x < 0` or `x > 6` in signed format, the program will jump to the default code block (`L8`). And map `0` and `4` to `L8` in jump table.
+- If the all cases contains negative number or starts from a larger number which is not near 0, the compiler will **put some bias** so that the first case is 0.
+- If it's a really big spread of cases and relatively sparse, the compiler will **revert to `if-else` code in halfway through on average (binary search)**, which can do in *logarithmic* time.
 
