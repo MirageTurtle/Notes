@@ -20,5 +20,5 @@ Wish me luck!
 
 ### Others
 
-- [ ] CVE Vulnerability resurfaces
+- [ ] PortSwigger Labs
 - [ ] Android Reverse Engineering
