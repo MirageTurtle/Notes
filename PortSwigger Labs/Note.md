@@ -78,3 +78,21 @@
 如果我们只想要获取`administrator`账户的密码，我们只需要利用`where`添加一个条件即可，`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,password+from+users+where+username=%27administrator%27--+`。
 
 但这题的本意是使用拼接，将用户名和密码作为一个column回显，这样我们就可以得到所有的用户名和密码，`https://xxxxxxx.web-security-academy.net/filter?category=ABC%27+union+select+%271%27,username||%27|%27||password+from+users--+`，我们可以得到只用`|`拼接用户名和密码的字段。这里需要注意我们不可以使用`&`进行拼接，因为`&`在URL用于连接不同参数。
+
+## 11: Blind SQL injection with conditional responses
+
+> 注入点在Cookie中的`TrackingId`字段，且为盲注。
+
+通过BurpSuite抓包，在`TrackingId`字段后分别添加`' and '1'='1`和`' and '1'='2`，可以确定闭合形式为单引号，同时可以注意到请求成功与否的区别在于是否有`Welcome back!`字符串，这可以作为我们盲注的判断依据。
+
+原本打算使用python写一个脚本（事实上我之前写过，应该也不是很难），但发现事实上发现可以使用BurpSuite来遍历从而实现盲注。使用python脚本有一些其他好处，例如可以二分查找，记录结果，在需要爆破库名时很有效。
+
+通过添加`' and (select '1' from users limit 1)='1`来确定存在`users`表（题目中的信息，实际情况中可能需要进行表名的盲注）。
+
+通过添加`' and (select '1' from users where username='administrator')='1`确定存在`administrator`用户。
+
+通过添加`' and (select '1' from users where username='administrator' and length(password)>1)='1`，确定返回中有`Welcome back!`字符串后，使用intruder对长度进行爆破，得到密码长度为20。
+
+然后对密码进行爆破，通过添加`' and (select substring(password,1,1) from users where username='administrator')='1`，我们可以使用`Cluster bomb`，同时遍历`substring`的index和盲注字符。
+
+在这里，我们可以直接对密码进行爆破，但实际环境中，我们需要一次对数据库名、表数量、表名、列数量、列名进行盲注，同时在最后对密码进行爆破时，也不可以使用类似于`Cluster bomb`的方式，我们可能需要利用二分查找等方式尽可能的减少请求次数，以规避将网站测试垮或自身访问被限制等风险。
