@@ -155,3 +155,13 @@
 WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据以xml形式传递的POST包，可以对xml字段进行注入，但简单尝试后会发现存在WAF。
 
 对于xml，可以在注入的地方加入`<@/hex_entities><@/hex_entities>`来包裹住payload，以绕过WAF，即`<storeId><@hex_entities>-1 union select password from users where username='administrator'<@/hex_entities></storeId>`。
+
+# Cross-site scripting
+
+## 1. Reflected XSS into HTML context with nothing encoded
+
+根据题目描述，在搜索处存在XSS，那就输入一个`test`尝试一下，发现前端页面有`<h1>0 search results for 'test'</h1>`，直接将请求中的test改成`<img src=x onerror=alert('test')>`即可。官方提供的payload为`<script>alert(1)</script>`。
+
+## 2. Stored XSS into HTML context with nothing encoded
+
+根据题目描述，在评论处存在XSS，直接查看之前评论的格式，被`<p>`包裹，直接评论`<img src=x onerror=alert(1)>`即可。
