@@ -165,3 +165,98 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 ## 2. Stored XSS into HTML context with nothing encoded
 
 根据题目描述，在评论处存在XSS，直接查看之前评论的格式，被`<p>`包裹，直接评论`<img src=x onerror=alert(1)>`即可。
+
+## 3. DOM XSS in `document.write` sink using source `location.search`
+
+> 通过这题，我们可以将`document.write`作为DOM XSS的一个特征，在之后挖掘过程中可以作为一个关键字直接进行搜索。
+>
+> DOM XSS 主要是闭合DOM元素来实现XSS。
+
+根据题目描述，直接搜索`document.write`定位到函数`trackSearch`：
+
+```html
+<script>
+  function trackSearch(query) {
+	  document.write('<img src="/resources/images/tracker.gif?searchTerms='+query+'">');
+  }
+  var query = (new URLSearchParams(window.location.search)).get('search');
+  if(query) {
+  	trackSearch(query);
+  }
+</script>
+```
+
+在console中查看`window.location.search`的值或`new URLSearchParams(window.location.search).get('search')`的值，可以发现`query`即为我们搜索框输入的内容。同时发现对应的元素为`<img src="/resources/images/tracker.gif?searchTerms=test">`。我们先输入`">`进行闭合，然后构造新元素`<img src=x onerror="alert(1)`与之后的`">`形成闭合。或者后面的payload直接写完整的再加上注释`<img src=x onerror=alert(1)>\\`，或者不加注释直接写payload，这样后面多余的`">`就会被解析成字符，官方解法就是如此。
+
+官方解法给的payload为`"><svg onload=alert(1)>`。
+
+## 4. DOM XSS in `innerHTML` sink using source `location.search`
+
+> 通过这题，我们的DOM XSS特征又多了一个`innerHTML`。
+
+同第3题一样，我们可以定位到相关的代码：
+
+```html
+<section class=blog-header>
+  <h1><span>2 search results for '</span><span id="searchMessage"></span><span>'</span></h1>
+  <script>
+    function doSearchQuery(query) {
+      document.getElementById('searchMessage').innerHTML = query;
+    }
+    var query = (new URLSearchParams(window.location.search)).get('search');
+    if(query) {
+      doSearchQuery(query);
+    }
+  </script>
+  <hr>
+</section>
+```
+
+可以看到对于我们可以控制的字符串来说，是用`<span></span>`进行闭合的，payload与上一题保持一致即可。payload：`</span><img src=x onerror=alert(1)>`。
+
+官方给的payload为`<img src=1 onerror=alert(1)>`，看上去`<img>`是可以包含在`<span></span>`中的。
+
+## 5. DOM XSS in jQuery anchor `href` attribute sink using `location.search` source
+
+> 根据题目的描述 *It uses the jQuery library's `$` selector function to find an anchor element, and changes its `href` attribute using data from `location.search`*，`$('#link').attr("href", something);`也可以作为一个特征。
+
+先定位代码：
+
+```html
+<form id="feedbackForm" action="/feedback/submit" method="POST" enctype="application/x-www-form-urlencoded">
+  <input required type="hidden" name="csrf" value="N5I35lWKgbePgTuN6OGyvxQGnGI7IjjX">
+  <label>Name:</label>
+  <input required type="text" name="name">
+  <label>Email:</label>
+  <input required type="email" name="email">
+  <label>Subject:</label>
+  <input required type="text" name="subject">
+  <label>Message:</label>
+  <textarea required rows="12" cols="300" name="message"></textarea>
+  <button class="button" type="submit">
+    Submit feedback
+  </button>
+  <span id="feedbackResult"></span>
+  <script src="/resources/js/jquery_1-8-2.js"></script>
+  <div class="is-linkback">
+    <a id="backLink">Back</a>
+  </div>
+  <script>
+    $(function() {
+      $('#backLink').attr("href", (new URLSearchParams(window.location.search)).get('returnPath'));
+    });
+  </script>
+</form>
+```
+
+同时确定修改的元素`<a id="backLink" href="/">Back</a>`。由以上信息我们理清了代码逻辑，url中的`returnPath`参数会被替换为`Back`按钮的返回链接，即`href`属性，我们可以通过闭合双引号来实现，也可以直接通过`javascript:alert(1)`来实现。
+
+官方给的解法是直接用`javascript:alert(document.cookie)`，我没能实现用闭合双引号的解法，但可以作为一种思路。
+
+这题我应该是解对了，但是不知道为什么系统没有检测到。
+
+## 6. DOM XSS in jQuery selector sink using a hashchange event
+
+> 这题利用<iframe>元素来调用`print()`函数，这个算是我的知识盲区了，正好学习一下。
+
+直接在exploit server的body里添加payload `<iframe src="https://YOUR-LAB-ID.web-security-academy.net/#" onload="this.src+='<img src=x onerror=print()>'"></iframe>`，然后deliver即可。
