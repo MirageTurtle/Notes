@@ -253,10 +253,31 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 
 官方给的解法是直接用`javascript:alert(document.cookie)`，我没能实现用闭合双引号的解法，但可以作为一种思路。
 
-这题我应该是解对了，但是不知道为什么系统没有检测到。
-
 ## 6. DOM XSS in jQuery selector sink using a hashchange event
 
 > 这题利用<iframe>元素来调用`print()`函数，这个算是我的知识盲区了，正好学习一下。
 
 直接在exploit server的body里添加payload `<iframe src="https://YOUR-LAB-ID.web-security-academy.net/#" onload="this.src+='<img src=x onerror=print()>'"></iframe>`，然后deliver即可。
+
+## 7. Reflected XSS into attribute with angle brackets HTML-encoded
+
+我尝试了对标签进行闭合的方式，不过最后失败了。官方给的payload是`"onmouseover="alert(1)`，经过观察可以发现，对于我们输入的test一共有两个地方有回显（我们称作reflection），但我只观察到`<h1>`标签对应的可以直接看到的信息，没有在Developer Tools里进行搜索，错失了第二个看不到的对应搜索框`<input>`标签属性的一个reflection。对于`<input>`标签，有`onmouseover`**事件**可以执行脚本，这样我们可以对`"`闭合然后进行xss注入，同理我们可以想到别的payload：`"onfocus="alert(1)`。
+
+## 8. Stored XSS into anchor `href` attribute with double quotes HTML-encoded
+
+找了半天没找到哪里有`href`让我注入，看了官方解法才知道评论的时候输入`website`才行，这提醒我们测试功能点的时候要一个不漏。接下来跟第5题就一样了，`javascript:alert(1)`即可。
+
+## 9. Reflected XSS into a JavaScript string with angle brackets HTML encoded
+
+与往常一样进行搜索，可以看到我们可以直接影响脚本代码：
+
+```html
+<script>
+  var searchTerms = 'test';
+  document.write('<img src="/resources/images/tracker.gif?searchTerms='+encodeURIComponent(searchTerms)+'">');
+</script>
+```
+
+尝试闭合`'`，成功：`';alert(1);var a='1`或者`';alert(1);//`。
+
+官方题解给的payload是`'-alert(1)-'`，是将单引号闭合之后，由于我们影响的是一个变量，可以利用加减乘除等操作，js需要先执行每一个运算数，才执行加减乘除，这个思路也可以学一下。
