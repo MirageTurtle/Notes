@@ -281,3 +281,9 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 尝试闭合`'`，成功：`';alert(1);var a='1`或者`';alert(1);//`。
 
 官方题解给的payload是`'-alert(1)-'`，是将单引号闭合之后，由于我们影响的是一个变量，可以利用加减乘除等操作，js需要先执行每一个运算数，才执行加减乘除，这个思路也可以学一下。
+
+## 10. DOM XSS in document.write sink using source location.search inside a select element
+
+搜索定位到商品详情页的html中有脚本来生成`<select>`列表，可以通过`storeId`参数来添加自定义选项，我们只需要传入`storeId=<script>alert(1)</script>`即可。
+
+官方给的payload为`product?productId=1&storeId="></select><img%20src=1%20onerror=alert(1)>`，对`<select>` 进行了闭合。
