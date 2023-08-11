@@ -287,3 +287,11 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 搜索定位到商品详情页的html中有脚本来生成`<select>`列表，可以通过`storeId`参数来添加自定义选项，我们只需要传入`storeId=<script>alert(1)</script>`即可。
 
 官方给的payload为`product?productId=1&storeId="></select><img%20src=1%20onerror=alert(1)>`，对`<select>` 进行了闭合。
+
+## 11. DOM XSS in AngularJS expression with angle brackets and double quotes HTML-encoded
+
+> 纯不知道，纯学习。
+
+官方payload：`{{$on.constructor('alert(1)')()}}`
+
+参考资料：https://stackoverflow.com/questions/72637416/what-does-on-constructor-do-in-angularjs，不过回答里最后给的等价形式有些问题，应该是等价于`function(){alert(1);}()`。
