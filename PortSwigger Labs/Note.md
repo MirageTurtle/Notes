@@ -295,3 +295,19 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 官方payload：`{{$on.constructor('alert(1)')()}}`
 
 参考资料：https://stackoverflow.com/questions/72637416/what-does-on-constructor-do-in-angularjs，不过回答里最后给的等价形式有些问题，应该是等价于`function(){alert(1);}()`。
+
+## 12. Reflected DOM XSS
+
+没有能做出来这题，直接记录官方的思路。
+
+随便输入抓包，可以发现返回值以JSON形式返回，且最后一个键值对为`"searchTerm":"test"`，使用返回值的JavaScript代码为`eval('var searchResultsObj = ' + this.responseText);`。这些信息也可以通过下断点来获得。
+
+这时，我们可以对双引号和花括号进行闭合，输入`test"-alert(1)}//`来进行XSS，但是会发现系统对`"`做了转义，所以我们需要使用`test\"-alert(1)}//`来进行XSS（系统并未对`\`进行转义，如果转义了就需要做出调整）。
+
+同理，我们也可以有新的payload：`test\"};alert(1)//`。
+
+## 13. Stored DOM XSS
+
+XSS点在评论内容，我的payload：`</p><img src=x onerror=alert(1)>`，官方的payload为`<><img src=1 onerror=alert(1)>`，官方的解释说是用前置的`<>`来绕过`replace()`函数。事实上后端应该是用`replace()`函数来实现转义，我payload中`</p>`的`<`和`>`就被转义了，后面的`<img>`就没有被转义，所以成功逃逸。
+
+**通过这两个DOM XSS可以看出，主要思路就是在传入后端的数据中，尝试闭合符合，注入payload，加入一些用来绕过后端函数的字符串，从而达到XSS在DOM中被执行的效果。**
