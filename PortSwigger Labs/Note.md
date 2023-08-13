@@ -311,3 +311,23 @@ WAF会检测SQL注入，在商品界面进行Check stock时，会有一个数据
 XSS点在评论内容，我的payload：`</p><img src=x onerror=alert(1)>`，官方的payload为`<><img src=1 onerror=alert(1)>`，官方的解释说是用前置的`<>`来绕过`replace()`函数。事实上后端应该是用`replace()`函数来实现转义，我payload中`</p>`的`<`和`>`就被转义了，后面的`<img>`就没有被转义，所以成功逃逸。
 
 **通过这两个DOM XSS可以看出，主要思路就是在传入后端的数据中，尝试闭合符合，注入payload，加入一些用来绕过后端函数的字符串，从而达到XSS在DOM中被执行的效果。**
+
+## 14. Reflected XSS into HTML context with most tags and attributes blocked
+
+ 在搜索框中搜索`<img src=x onerror=alert(1)>`会得到返回`"Tag is not allowed"`。再往后我就没什么想法了，但其实要做的很简单，测试哪些tag可用哪些不可用。做法也很简单，利用BurpSuite的Intruder和官方的[XSS cheat sheet](https://portswigger.net/web-security/cross-site-scripting/cheat-sheet)中提供的所有tag，即可进行测试。
+
+测试会发现只有`<body>`和`<custom tags>`可用。然后故技重施，测试所有可用的event来帮助我们触发`print()`函数。最后发现`onresize`、`onscrolled`、`onratechange`、`onbeforeinput`、`onbeforetoggle`可用，选择一个合理的构造payload即可，例如`<iframe src="https://YOUR-LAB-ID.web-security-academy.net/?search=%22%3E%3Cbody%20onresize=print()%3E" onload=this.style.width='100px'>`，其中先对`""`和`<>`进行闭合。
+
+如果没有`onload=this.style.width='100px'`会无法成功，因为这是在调整界面大小，即触发`onresize`的条件。
+
+## 15. Reflected XSS into HTML context with all tags blocked except custom ones
+
+官方payload如下：
+
+```html
+<script>
+location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+onfocus%3Dalert%28document.cookie%29%20tabindex=1%3E#x'
+</script>
+```
+
+依然是`search`字段，构造一个custom tag为`xss`，`id=x`，event为`onfocus`，利用`location = 'https://xxx.xxx/#x'`的锚点定位到这一元素触发`onfocus`。`tabindex` 属性规定当使用tab键进行导航时元素的顺序，看上去是结合锚点一起才能触发`onfocus`。
