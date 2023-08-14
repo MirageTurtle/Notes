@@ -331,3 +331,7 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 ```
 
 依然是`search`字段，构造一个custom tag为`xss`，`id=x`，event为`onfocus`，利用`location = 'https://xxx.xxx/#x'`的锚点定位到这一元素触发`onfocus`。`tabindex` 属性规定当使用tab键进行导航时元素的顺序，看上去是结合锚点一起才能触发`onfocus`。
+
+## 16. Reflected XSS with some SVG markup allowed
+
+这里测试一下哪些tag可以用，发现`svg`可以用，但`svg`的所有event都被block了。我们发现`animatetransform`是可以用的，所以结合两者，最终的payload为`<svg><animatetransform onbegin=alert(document.cookie)>`，`animatetransform`用来操作`svg`，然后触发`onbegin`。
