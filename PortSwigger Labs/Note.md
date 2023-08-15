@@ -335,3 +335,11 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 ## 16. Reflected XSS with some SVG markup allowed
 
 这里测试一下哪些tag可以用，发现`svg`可以用，但`svg`的所有event都被block了。我们发现`animatetransform`是可以用的，所以结合两者，最终的payload为`<svg><animatetransform onbegin=alert(document.cookie)>`，`animatetransform`用来操作`svg`，然后触发`onbegin`。
+
+## 17. Reflected XSS in canonical link tag
+
+在`<head>`中有一个`<link rel="canonical" href=''/>`的标签来表示权威url的链接，参考资料：https://www.wbolt.com/what-is-canonical-url.html
+
+对于一个标签，我们可以利用`accesskey`和`onclick`属性进行XSS（仅限于Chrome），参考链接：https://security.stackexchange.com/questions/175304/how-to-perform-xss-in-hidden-html-input-fields-using-accesskey
+
+这里我们发现权威url的值即为我们访问的url，此时进行单引号闭合并添加属性即可。由于我们是在URL中动手脚，为了保证浏览器能够正常访问到该页面（靶场），我们需要使用`?`来分割原url和payload（在浏览器看来我们的payloud只是参数，但在解析时会造成XSS），最终payload为`https://xxxxxxx.web-security-academy.net/?%27accesskey=%27x%27onclick=%27alert(1)`，不使用`%20`来进行分割，因为`%20`不会被转义会空格，且不需要空格HTML也可以正常解析，实战中多尝试即可。
