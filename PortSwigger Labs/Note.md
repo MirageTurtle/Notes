@@ -343,3 +343,19 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 对于一个标签，我们可以利用`accesskey`和`onclick`属性进行XSS（仅限于Chrome），参考链接：https://security.stackexchange.com/questions/175304/how-to-perform-xss-in-hidden-html-input-fields-using-accesskey
 
 这里我们发现权威url的值即为我们访问的url，此时进行单引号闭合并添加属性即可。由于我们是在URL中动手脚，为了保证浏览器能够正常访问到该页面（靶场），我们需要使用`?`来分割原url和payload（在浏览器看来我们的payloud只是参数，但在解析时会造成XSS），最终payload为`https://xxxxxxx.web-security-academy.net/?%27accesskey=%27x%27onclick=%27alert(1)`，不使用`%20`来进行分割，因为`%20`不会被转义会空格，且不需要空格HTML也可以正常解析，实战中多尝试即可。
+
+## 18. Reflected XSS into a JavaScript string with single quote and backslash escaped
+
+> 画个重点，对于转义字符的绕过我觉得是比较重要的。
+>
+> 关键是backslash被转义，如果只是其他字符被转义可以尝试使用backslash进行逃逸。
+>
+> 另外可以注意single quote是被使用backslash进行转义还是使用了html编码转义。
+
+这道题XSS漏洞的点在于“对字符进行了转义，但用户输入的变量会修改`<scrip></script>`的内容“，我们可以直接使用`</script>`进行闭合后添加新的脚本，最终payload为`</script><script>alert(1)</script>`。
+
+## 19. Reflected XSS into a JavaScript string with angle brackets and double quotes HTML-encoded and single quotes escaped
+
+> 在backslash没有被转义时，可以尝试使用backslash进行引号的逃逸，这里将`\`转义成了`\\`，但这不影响逃逸引号。
+
+知道原理多看开发者工具就很容易得到payload：`test\'-alert(1);//`
