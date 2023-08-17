@@ -359,3 +359,11 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 > 在backslash没有被转义时，可以尝试使用backslash进行引号的逃逸，这里将`\`转义成了`\\`，但这不影响逃逸引号。
 
 知道原理多看开发者工具就很容易得到payload：`test\'-alert(1);//`
+
+## 20. Stored XSS into `onclick` event with angle brackets and double quotes HTML-encoded and single quotes and backslash escaped
+
+这道题其实关键点都找对了，但是没能做出来。
+
+先可以随意尝试，会发现必须要正常的web协议才可以，像`javascript:`伪协议是行不通的。之后Developer Tools中一搜会发现有`onclick`的脚本（标题也提示了其实），我的目标就转成了拼接单引号，即原本是`'http://test.com'`，变为`'http://test.com'-alert(1)-''`，即payload内容为`http://test.com'-alert(1)'`，但无法正常输入，因为单引号被转义成了`\'`。各种尝试之后看了官方solution，发现将`'`替换成`&apos;`即可。可能跟`tracker.track`也有关系吧。
+
+官方payload给的是`http://test.com&apos;?-alert(1)&apos;`，这样有了`?`可以防止跳转过去url解析错误。但没有`?`也可以触发XSS漏洞。
