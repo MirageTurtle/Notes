@@ -367,3 +367,7 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 先可以随意尝试，会发现必须要正常的web协议才可以，像`javascript:`伪协议是行不通的。之后Developer Tools中一搜会发现有`onclick`的脚本（标题也提示了其实），我的目标就转成了拼接单引号，即原本是`'http://test.com'`，变为`'http://test.com'-alert(1)-''`，即payload内容为`http://test.com'-alert(1)'`，但无法正常输入，因为单引号被转义成了`\'`。各种尝试之后看了官方solution，发现将`'`替换成`&apos;`即可。可能跟`tracker.track`也有关系吧。
 
 官方payload给的是`http://test.com&apos;?-alert(1)&apos;`，这样有了`?`可以防止跳转过去url解析错误。但没有`?`也可以触发XSS漏洞。
+
+## 21. Reflected XSS into a template literal with angle brackets, single, double quotes, backslash and backticks Unicode-escaped
+
+看了半天没有能绕过，最后学到了新的语法：在`` ` ``中可以使用`${alert(1)}`来执行JavaScript语句。
