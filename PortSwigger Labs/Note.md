@@ -457,3 +457,5 @@ function handleResponse() {
 直接搬的官方payload，把`@`做了url encoding，防止报错，虽然不做也可以过。
 
 就是新建一个请求，然后访问`/my-account`，然后记录CSRF Token，最后请求修改email即可。
+
+但好像自己访问并不会修改email，同时我第二次用这个payload并没有成功solve这个lab，同样的，email也没有修改（第一次是solve了但是email没有修改）。这里应该有一些东西没有彻底搞明白。
