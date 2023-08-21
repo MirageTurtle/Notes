@@ -679,3 +679,75 @@ But here's some tricky things when compiler compiles `switch-case` statements:
 - If the all cases contains negative number or starts from a larger number which is not near 0, the compiler will **put some bias** so that the first case is 0.
 - If it's a really big spread of cases and relatively sparse, the compiler will **revert to `if-else` code in halfway through on average (binary search)**, which can do in *logarithmic* time.
 
+## Lecture 7: Machine-Level Programming III: Procedures
+
+>  Create Time: 2023.08.21  Update Time: 2023.08.21
+
+### Mechanisms in Procedures
+
+Break procedures into some small settles.
+
++ Passing control
+  + To beginning of procedure code
+  + Back to return point
++ Passing data
+  + Procedure arguments
+  + Return value
++ Memory management
+  + Allocate during procedure execution
+  + Deallocate upon return
+
+### Stack Structure
+
+> Stack is the right data structure for procedure call/return
+
+To the assembly-level programmers' perspective, memory is just a big array of bytes. And somewhere within that bunch of bytes, we're going to call it the stack. And the stack is used by the program to manage the state associated with the procedures that it calls and as they return.
+
+`%rsp` is the stack pointer. When more data are allocated for the stack, stack pointer decrements.
+
++ `pushq src`
++ `popq src`
+
+### Calling Conventions
+
+#### Procedure Control Flow
+
+Use stack to support procedure call and return
+
++ Procedure call: `call label`
+  + Push return address (address of the next instruction right after call) on stack
+  + Jump to label
++ Procedure return: `ret`
+  + Pop address from stack
+  + Jump to address
+
+#### Passing Data
+
++ First 6 integer and pointer arguments: `%rdi`, `%rsi`, `%rdx`, `%rcx`, `%r8`, `%r9`
+  + Put the arguments part more than 6 in memory on the stack.
+  + Only allocate stack space when needed.
++ Return value: `%rax`
+
+#### Managing local data
+
+Each block we use for a particular call is called the **stack frame**.
+
+Base pointer/frame pointer is `%rbp`, which is an optional pointer. For most programs, compiler will compute what size of a stack frame a function needs, and allocate stack frame to the function. `%rbp` is mostly only used when a function try to allocate an array with variable size.
+
+#### Register Saving Conventions
+
++ Caller Saved
+  + Caller saves temporary values in its frame before the call
+  + `%rax`: Return value
+  + `%rdi`, `%rsi`, `%rdx`, `%rcx`, `%r8`, `%r9`: Arguments
+  + `%r10`, `%r11`: Caller-saved temporaries
++ Callee saved
+  + Callee saves temporary values in its frame before using
+  + Callee restores them before returning to caller
+  + `%rbx`, `%r12`, `%r13`, `%r14`: Callee-saved temporaries
+  + `%rbp`: May be used as frame pointer
+  + `%rsp`: Special form of callee save, and it restored to original value upon exit from procedure
+
+### Illustration of Recursion
+
+The stack principle makes recursion work, even mutual recursion.
