@@ -751,3 +751,27 @@ Base pointer/frame pointer is `%rbp`, which is an optional pointer. For most pro
 ### Illustration of Recursion
 
 The stack principle makes recursion work, even mutual recursion.
+
+## Lecture 8: Machine-Level Programming IV: Data
+
+> Create Time: 2023.08.22  Update Time: 2023.08.22
+
+### Arrays
+
+#### One-dimensional: `T A[L];`
+
+**Array Allocation**
+
++ Array of data type `T` and length `L`
++ Contiguously allocated region of `L * sizeof(T)` bytes in memory
+
+**Array Access**
+
++ Array of dta type `T` and length`L`
++ Identifier `A` can be used as a pointer to array element 0: `Type T*`
++ `(%rdi, %rsi, 4)`: `%rdi + %rsi * 4`
+
+
+
+
+
