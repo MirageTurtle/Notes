@@ -754,7 +754,9 @@ The stack principle makes recursion work, even mutual recursion.
 
 ## Lecture 8: Machine-Level Programming IV: Data
 
-> Create Time: 2023.08.22  Update Time: 2023.08.22
+> Create Time: 2023.08.22  Update Time: 2023.08.23
+
+> I don't like the video of this lecture, because I can not access too many hand-writing content by the teacher.
 
 ### Arrays
 
@@ -771,7 +773,26 @@ The stack principle makes recursion work, even mutual recursion.
 + Identifier `A` can be used as a pointer to array element 0: `Type T*`
 + `(%rdi, %rsi, 4)`: `%rdi + %rsi * 4`
 
+#### Multi-dimensional (nested): `T A[R][C];`
 
++ 2D array of data type `T`
++ `R` rows, `C` columns
++ Array Size: `R * C * sizeof(T)`
++ Arrangement: Row-major Ordering
 
+**Row Vectors**
 
++ `A[i]` is array of `C` elements
++ Starting address `A + i * (C * sizeof(T))`
+
+**Array Elements**
+
++ `A[i][j]` is element of type `T`
++ Address `A + i * (C * sizeof(T)) + j * sizeof(T) = A + (i * C + j) * sizeof(T)`
+
+#### Multi-Level Array
+
+It means an array pointer pointing some arrays. For example, `int *univ[3] = {mit, cmu, ucb}`.
+
+The difference between nested array and multi-level array is that, nested array does only one memory reference, but multi-level array does twice, for a two-dimensional array. Because multi-level array need do one memory reference to get the address of the low-level array first.
 
