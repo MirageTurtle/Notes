@@ -754,7 +754,7 @@ The stack principle makes recursion work, even mutual recursion.
 
 ## Lecture 8: Machine-Level Programming IV: Data
 
-> Create Time: 2023.08.22  Update Time: 2023.08.23
+> Create Time: 2023.08.22  Update Time: 2023.08.24
 
 > I don't like the video of this lecture, because I can not access too many hand-writing content by the teacher.
 
@@ -796,3 +796,60 @@ It means an array pointer pointing some arrays. For example, `int *univ[3] = {mi
 
 The difference between nested array and multi-level array is that, nested array does only one memory reference, but multi-level array does twice, for a two-dimensional array. Because multi-level array need do one memory reference to get the address of the low-level array first.
 
+### Structure
+
+#### Representation
+
++ Structure represented as block of memory, which is big enough to hold all of the fields.
++ Fields ordered according to declaration, even if another ordering could yield a more compact representation.
++ Machine-level program has no understanding of the structures in the source code, and the compiler determines overall size + positions of fields.
+
+#### Alignment Principles
+
+**Aligned Data**
+
++ Primitive data type requires `K` bytes
++ Address must be multiple of `K`
+
+**Motivation for Aligning Data**
+
++ Memory accessed by (aligned) chunks of 4 or 8 bytes (system dependent)
+
+**Compiler**
+
++ Insert gaps in structure to ensure correct alignment of fields
+
+#### Alignment with Structures
+
+**Within structure**
+
++ Must satisfy each element's alignment requirement
+
+**Overall structure placement**
+
++ Each structure has alignment requirement `K`, which is the largest alignment of any element
++ Initial address and structure length must be multiples of `K`.
+
+#### Saving Space
+
+A useful method to save space (e.g., make less useless space for alignment) is putting large data types first.
+
+### Floating Point
+
+#### Basics
+
++ Arguments passed in `%xmm0`, `%xmm`, ...
++ Result returned in `%xmm0`
++ All XMM registers are caller-saved.
+
+#### Memory Referencing
+
++ Integer and pointer arguments passed in regular registers
++ Floating point values passed in XMM registers
++ Different `mov` instructions to move between XMM registers, and between memory and XMM registers
+
+#### Others
+
++ Lots of instructions
++ Floating-point comparisons
++ Various tricks to use constant values
