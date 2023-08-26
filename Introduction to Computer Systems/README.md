@@ -10,7 +10,7 @@ Finally, I use port-forwarding to figure it out.
 
 ```
 cd /path/to/directory/within/dockerfile_and_compose.yml
-UID=$(id -u) GID=$(id -g) docker compose -d
+UID=$(id -u) GID=$(id -g) docker compose up -d
 ```
 
 Now you can use `ssh root@127.0.0.1 -p 8022` with the password `csapplab` to login the environment. You may find that the user in docker is root, but don't worry about the permission of the compiled executable files. Feel free to use it.
