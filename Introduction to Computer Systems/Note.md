@@ -856,7 +856,7 @@ A useful method to save space (e.g., make less useless space for alignment) is p
 
 ## Lecture 9: Machine-Level Programming V: Advanced Topics
 
->  Create Time: 2023.08.25  Update Time: 2023.08.25
+>  Create Time: 2023.08.25  Update Time: 2023.08.26
 
 ### Memory Layout
 
@@ -907,6 +907,35 @@ int main()
 ```
 
 ### Buffer Overflow
+
+Recall the codes of **Great Reality #3** in Lecture 1, and there is a potential buffer overflow bug.
+
+#### Most common form
+
++ Unchecked lengths on string inputs
+  + `gets`
+  + `strcpy`, `strcat`
+  + `scanf`,`fscanf`,`sscanf`
++ Particularly for bounded character arrays on the stack
+  + Sometimes referred to as stack smashing
+
+#### Code Injection Attacks
+
++ Input string contains byte representation of executable code
++ Overwrite return address A with address of buffer B
++ When Q executes `ret`, it will jump to exploit code
+
+#### Protection
+
+1. Avoid Overflow Vulnerabilities in Code.
+   + `fgets` instead of `gets`
+   + `strncpy` instead of `strcpy`
+   + Use `fgets` to read the string, or use `%ns` where `n` is a suitable integer.
+2. System-Level Protections
+   + Randomized stack offsets
+     + ASLR (Address Space Layout Randomization)
+   + Nonexecutable code segments
+3. Stack Canaries
 
 ### Unions
 
