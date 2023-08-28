@@ -937,5 +937,27 @@ Recall the codes of **Great Reality #3** in Lecture 1, and there is a potential 
    + Nonexecutable code segments
 3. Stack Canaries
 
+#### Return-Oriented Programming Attacks
+
+**Construct program from *gadgets***
+
++ Sequence of instructions ending in `ret`, which encoded by single byte `0xc3`
++ Code positions fixed from run to run
++ Code is executable
+
 ### Unions
+
++ Allocate according to largetst element
++ Can only use one field at a time
+
+**Byte Ordering**
+
+```C
+union {
+  unsigned char c[8];
+  unsigned short s[4];
+  unsigned int i[2];
+  unsigned long l[1];
+} dw;
+```
 
