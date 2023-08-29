@@ -11,3 +11,5 @@ services:
       - 8022:22
     volumes:
       - ./:/home/csapp/labs 
+    security_opt:
+      - seccomp:unconfined
