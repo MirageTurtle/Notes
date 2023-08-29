@@ -961,3 +961,42 @@ union {
 } dw;
 ```
 
+## Lab: Bomb Lab
+
+> Create Time: 2023.08.29  Update Time: 2023.08.29
+
+> I'm focusing on noting for Activity 3.
+
+You can solve this lab by reading the definition of func `compare` in code file `act3.s`. I'm not familiar with assembly code, so I need `gdb` to help me. But here I record the solution of this lab by comments in assembly code.
+
+```assembly
+compare:
+.LFB0:
+    .cfi_startproc
+    pushq     %rbx						/* Record the return address */
+    movq      %rdi, %rbx			/* %rbx: num1(%rdi) */
+    addq      $5, %rbx				/* %rbx: num1 + 5 */
+    addq      %rsi, %rbx			/* %rbx: num1 + 5 + num2 */
+    cmpq      $15213, %rbx		/* Compare %rbx(num1 + 5 + num2) and 15213 */
+    sete      %al							/* Set ZF and CF flags */
+    movzbq    %al, %rax				/* the result of comparation, 1 if equal and 0 if not */
+    popq      %rbx						/* Pop the return address */
+    ret												/* Return, and the return value is %rax(the comparation result) */
+    .cfi_endproc
+```
+
+So we can get the solution is input two numbers whose sum is `15213 - 5 = 15208`. Here's my test:
+
+```bash
+root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15213 -5
+good args!
+root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15212 -4
+good args!
+root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15210 -2
+good args!
+root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15208 0
+good args!
+root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15200 8
+good args!
+```
+
