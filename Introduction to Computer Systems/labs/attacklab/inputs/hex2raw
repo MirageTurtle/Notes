@@ -1,0 +1,95 @@
+#!/usr/bin/env python3
+
+"""
+This program converts hex-encoded bytes into raw bytes, or "binary form".
+
+For example, the character "a" is represented in ASCII by 0x61, so in order
+to output that raw byte, you would provide the input "61" to this program.
+
+This program provides the same functionality as "xxd -r -p", but it also
+supports comments, and provides relevant error messages. To perform the
+reverse operation (displaying a binary file as hex), use "xxd" for
+human-formatted output, and "xxd -p" for plain output.
+
+Sample usage:
+    $ ./hex2raw
+    61 62 63
+    ^D
+    123
+
+    $ ./hex2raw < sample.txt > sample.bin
+    $ ./hex2raw sample.txt sample.bin
+
+Authors:
+    Kevin Geng (khg), February 2020
+"""
+
+import argparse
+import binascii
+import re
+import sys
+
+
+def convert_hex_string(text):
+    # Remove all comments in the text: /* */, //, and #
+    # Note: this needs to be in one regex for correctness
+    text = re.sub(r'(/\*[\s\S]*?\*/)|(//.*$)|(#.*$)', '', text, flags=re.M)
+
+    # Search for invalid characters (not hex or whitespace)
+    matches = re.findall(r'[^\s0-9a-fA-F]+', text)
+    if matches:
+        print('ERROR: invalid characters in input:', file=sys.stderr)
+        print(', '.join(map(repr, matches)), file=sys.stderr)
+        print('Please use only hex characters: 0-9 and a-f.', file=sys.stderr)
+        exit(1)
+
+    # Remove all whitespace
+    text = re.sub(r'\s+', '', text)
+
+    # Make sure length is correct
+    if len(text) % 2 != 0:
+        print('ERROR: input length is odd.', file=sys.stderr)
+        print('Make sure each byte is represented by two hex characters.',
+              file=sys.stderr)
+        exit(1)
+
+    # Use binascii to convert and catch any errors
+    try:
+        result = binascii.unhexlify(text)
+    except binascii.Error as e:
+        print("ERROR: couldn't parse hex: {}".format(e), file=sys.stderr)
+        exit(1)
+
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description='Convert hex-encoded bytes into raw bytes.')
+    parser.add_argument('infile',
+                        nargs='?',
+                        type=argparse.FileType('r'),
+                        default='-',
+                        help='specify an input file to read from')
+    parser.add_argument('outfile',
+                        nargs='?',
+                        type=argparse.FileType('wb'),
+                        default='-',
+                        help='specify an output file to write to')
+    args = parser.parse_args()
+
+    # Make sure we write to stdout as binary, not text
+    if args.outfile == sys.stdout:
+        args.outfile = sys.stdout.buffer
+
+    text = args.infile.read()
+    args.infile.close()
+
+    result = convert_hex_string(text)
+
+    args.outfile.write(result)
+    args.outfile.close()
+
+
+if __name__ == '__main__':
+    main()
