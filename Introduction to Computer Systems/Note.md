@@ -961,9 +961,9 @@ union {
 } dw;
 ```
 
-## Lab: Bomb Lab
+## Recitation: Bomb Lab 
 
-> Create Time: 2023.08.29  Update Time: 2023.08.29
+> Create Time: 2023.08.29  Update Time: 2023.09.06
 
 > I'm focusing on noting for Activity 3.
 
