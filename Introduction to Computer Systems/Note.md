@@ -1000,3 +1000,30 @@ root@d5661d8d55f2:/home/csapp/labs/bomblab# ./act3 15200 8
 good args!
 ```
 
+## Lab: Bomb Lab
+
+> Create Time: 2023.09.07  Update Time: 2023.09.07
+
+Here's the solution of bomb lab. Sometimes, there's many strings for defusing one bomb.
+
+I use `objdump -d bomb > obj.txt` to get the assembly code for bomb file, which I think can help me a lot. I can get the function for explode bombs. Take bomb 1/phase 1 as an example, I can get `phase_1(input);` to handle the phase 1, and then I can get related assembly code from `obj.txt`, where I can find a function naming `explode_bomb`. So I will `break explode_bomb` first to prevent exploding bombs.
+
+### Bomb 1
+
+> `break explode_bomb` and `break phase_1` first and then `run`.
+
+After type `123456` the program paused by breakpoint. We can get assembly code by command `disas` or file `obj.txt`. We find:
+
+```disassembly
+400ee4:	be 00 24 40 00       	mov    $0x402400,%esi
+400ee9:	e8 4a 04 00 00       	callq  401338 <strings_not_equal>
+400eee:	85 c0                	test   %eax,%eax
+400ef0:	74 05                	je     400ef7 <phase_1+0x17>
+400ef2:	e8 43 05 00 00       	callq  40143a <explode_bomb>
+400ef7:	48 83 c4 08          	add    $0x8,%rsp
+```
+
+This part code means, if the string we put is equal the one in program, we can jump over the `explode_bomb`. From the previous lectures, we can know the registers for the first two parameters is `%rdi` and `%rsi`, and we know the relation between `%rsi` and `%esi`. From this, we can guess the target string is at `0x402400`. And we get it by command `x/s 0x402400`, and it's `Border relations with Canada have never been better.`. Run again in gdb (because the breakpoint at `explode_bomb` can help me), type this string, and we find we defuse the first bomb.
+
+> I save my answers in `ans.txt`, and I can use `./bomb ans.txt` or `run ans.txt` in gdb to pass the bombs I have defused.
+
