@@ -1014,7 +1014,7 @@ I use `objdump -d bomb > obj.txt` to get the assembly code for bomb file, which 
 
 After type `123456` the program paused by breakpoint. We can get assembly code by command `disas` or file `obj.txt`. We find:
 
-```disassembly
+```assembly
 400ee4:	be 00 24 40 00       	mov    $0x402400,%esi
 400ee9:	e8 4a 04 00 00       	callq  401338 <strings_not_equal>
 400eee:	85 c0                	test   %eax,%eax
@@ -1023,7 +1023,74 @@ After type `123456` the program paused by breakpoint. We can get assembly code b
 400ef7:	48 83 c4 08          	add    $0x8,%rsp
 ```
 
-This part code means, if the string we put is equal the one in program, we can jump over the `explode_bomb`. From the previous lectures, we can know the registers for the first two parameters is `%rdi` and `%rsi`, and we know the relation between `%rsi` and `%esi`. From this, we can guess the target string is at `0x402400`. And we get it by command `x/s 0x402400`, and it's `Border relations with Canada have never been better.`. Run again in gdb (because the breakpoint at `explode_bomb` can help me), type this string, and we find we defuse the first bomb.
+This part code means, if the string we put is equal the one in program, we can jump over the `explode_bomb`. From the previous lectures, we can know the registers for the first two parameters is `%rdi` and `%rsi`, and we know the relation between `%rsi` and `%esi`. From this, we can guess the target string is at `0x402400`. And we get it by command `x/s 0x402400`, and it's "`Border relations with Canada have never been better.`". Run again in gdb (because the breakpoint at `explode_bomb` can help me), type this string, and we find we defuse the first bomb.
 
 > I save my answers in `ans.txt`, and I can use `./bomb ans.txt` or `run ans.txt` in gdb to pass the bombs I have defused.
+
+### Bomb 2
+
+When reading assembly code of `phase_2` function, we found it calls `read_six_numbers` first. So we guess we need to input six number. Actually, we can read assembly code of `read_six_numbers` and we can find a memory address `0x4025c3` for `sscanf` call, where "`%d %d %d %d %d %d`" stays. So we need input six integers. I input `1 2 3 4 5 6` for test.
+
+Here's assembly code for `read_six_numbers`:
+
+```assembly
+000000000040145c <read_six_numbers>:
+  40145c:	48 83 ec 18          	sub    $0x18,%rsp
+  401460:	48 89 f2             	mov    %rsi,%rdx
+  401463:	48 8d 4e 04          	lea    0x4(%rsi),%rcx
+  401467:	48 8d 46 14          	lea    0x14(%rsi),%rax
+  40146b:	48 89 44 24 08       	mov    %rax,0x8(%rsp)
+  401470:	48 8d 46 10          	lea    0x10(%rsi),%rax
+  401474:	48 89 04 24          	mov    %rax,(%rsp)
+  401478:	4c 8d 4e 0c          	lea    0xc(%rsi),%r9
+  40147c:	4c 8d 46 08          	lea    0x8(%rsi),%r8
+  401480:	be c3 25 40 00       	mov    $0x4025c3,%esi
+  401485:	b8 00 00 00 00       	mov    $0x0,%eax
+  40148a:	e8 61 f7 ff ff       	callq  400bf0 <__isoc99_sscanf@plt>
+  40148f:	83 f8 05             	cmp    $0x5,%eax
+  401492:	7f 05                	jg     401499 <read_six_numbers+0x3d>
+  401494:	e8 a1 ff ff ff       	callq  40143a <explode_bomb>
+  401499:	48 83 c4 18          	add    $0x18,%rsp
+  40149d:	c3                   	retq
+```
+
+Why do we need to understand the function to read our inputs instead of testing the `phase_2` function directly? Becase if we want to test `phase_2` better, we need to know where out inputs go first.
+
+We find it allocate `0x18 = 24 = 6 * 4` bytes for six integers at the top of stack by `sub $0x18, %rsp`. Referenced by `sscanf` format `int sscanf(const char *str, const char *format, ...)`, we know we should find the target address by `%rdx`, `%rcx`, `%r8`, `%r9`. Noted the command `mov %rsp,%rsi` before calling `read_six_numbers`, we can know that, `%rdx` is pointing the 4 bytes at the bottom of this 24 bytes space, `%rcx` is pointing the next one, and `%r8` and `%r9` follow them. Where are the last two integers? Look at `lea 0x10(%rsi),%rax` and `mov %rax,(%rsp)`, they mean the fifth integers will be saved at `0x10(%rsi)`, which is followed by the fourth integers. If you're a little confused, you may be review the part of Passing Data in Lecture 07. Now we know the six numbers are saved at the stack, and on the frame of `phase_2`.
+
+Back to `phase_2`, we get the first bomb check:
+
+```assembly
+400f0a:	83 3c 24 01          	cmpl   $0x1,(%rsp)
+400f0e:	74 20                	je     400f30 <phase_2+0x34>
+400f10:	e8 25 05 00 00       	callq  40143a <explode_bomb>
+```
+
+This mean if the integer `%rsp` pointing (i.e., the first integer I input) is not `0x1`, the bomb is exploded. Luckily, the first integer I input is `1`, so I pass this check. Now I focus on the following bomb check, and I will explain the code by comments:
+
+```assembly
+0x0000000000400f05 <+9>:     callq  0x40145c <read_six_numbers>	# read six integers
+0x0000000000400f0a <+14>:    cmpl   $0x1,(%rsp)									# if the first one is 1
+0x0000000000400f0e <+18>:    je     0x400f30 <phase_2+52>				# if it is, jump to PHASE_2+52
+0x0000000000400f10 <+20>:    callq  0x40143a <explode_bomb>
+0x0000000000400f15 <+25>:    jmp    0x400f30 <phase_2+52>
+0x0000000000400f17 <+27>:    mov    -0x4(%rbx),%eax							# %eax is the previous integer
+0x0000000000400f1a <+30>:    add    %eax,%eax										# double %eax
+0x0000000000400f1c <+32>:    cmp    %eax,(%rbx)									# if the integer is equal to double previous one
+0x0000000000400f1e <+34>:    je     0x400f25 <phase_2+41>				# if it is, jump
+0x0000000000400f20 <+36>:    callq  0x40143a <explode_bomb>
+0x0000000000400f25 <+41>:    add    $0x4,%rbx										# move %rbx to next one
+0x0000000000400f29 <+45>:    cmp    %rbp,%rbx										# if the all integers are checked?
+0x0000000000400f2c <+48>:    jne    0x400f17 <phase_2+27>				# if not, go on
+0x0000000000400f2e <+50>:    jmp    0x400f3c <phase_2+64>				# if all are checked, finished.
+0x0000000000400f30 <+52>:    lea    0x4(%rsp),%rbx							# %rbx is address of the second integer
+0x0000000000400f35 <+57>:    lea    0x18(%rsp),%rbp							# %rbp is the end address of all integers
+0x0000000000400f3a <+62>:    jmp    0x400f17 <phase_2+27>
+0x0000000000400f3c <+64>:    add    $0x28,%rsp
+0x0000000000400f40 <+68>:    pop    %rbx
+0x0000000000400f41 <+69>:    pop    %rbp
+0x0000000000400f42 <+70>:    retq
+```
+
+Now we know need to input six numbers, the first one of which is must be `1` and the every integer is double of the previous one. So the answer is `1 2 4 8 16 32`.
 
