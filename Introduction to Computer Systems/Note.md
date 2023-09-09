@@ -1094,3 +1094,70 @@ This mean if the integer `%rsp` pointing (i.e., the first integer I input) is no
 
 Now we know need to input six numbers, the first one of which is must be `1` and the every integer is double of the previous one. So the answer is `1 2 4 8 16 32`.
 
+### Bomb 3
+
+As before, I can easily find I need to input 2 integers by `x/s 0x4025cf`, and the 2 integers will be saved at `0x8(%rsp)` and `0xc(%rsp)`.
+
+```assembly
+0x0000000000400f43 <+0>:     sub    $0x18,%rsp
+0x0000000000400f47 <+4>:     lea    0xc(%rsp),%rcx						# the second one
+0x0000000000400f4c <+9>:     lea    0x8(%rsp),%rdx						# the first one
+0x0000000000400f51 <+14>:    mov    $0x4025cf,%esi
+0x0000000000400f56 <+19>:    mov    $0x0,%eax
+0x0000000000400f5b <+24>:    callq  0x400bf0 <__isoc99_sscanf@plt>
+0x0000000000400f60 <+29>:    cmp    $0x1,%eax
+0x0000000000400f63 <+32>:    jg     0x400f6a <phase_3+39>
+0x0000000000400f65 <+34>:    callq  0x40143a <explode_bomb>
+0x0000000000400f6a <+39>:    cmpl   $0x7,0x8(%rsp)						# compare the first one and 7
+0x0000000000400f6f <+44>:    ja     0x400fad <phase_3+106>		# if the integer > 7, explode the bomb.
+0x0000000000400f71 <+46>:    mov    0x8(%rsp),%eax
+0x0000000000400f75 <+50>:    jmpq   *0x402470(,%rax,8)				# jump to the address stored in the target address
+0x0000000000400f7c <+57>:    mov    $0xcf,%eax
+0x0000000000400f81 <+62>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400f83 <+64>:    mov    $0x2c3,%eax
+0x0000000000400f88 <+69>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400f8a <+71>:    mov    $0x100,%eax
+0x0000000000400f8f <+76>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400f91 <+78>:    mov    $0x185,%eax
+0x0000000000400f96 <+83>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400f98 <+85>:    mov    $0xce,%eax
+0x0000000000400f9d <+90>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400f9f <+92>:    mov    $0x2aa,%eax
+0x0000000000400fa4 <+97>:    jmp    0x400fbe <phase_3+123>
+0x0000000000400fa6 <+99>:    mov    $0x147,%eax
+0x0000000000400fab <+104>:   jmp    0x400fbe <phase_3+123>
+0x0000000000400fad <+106>:   callq  0x40143a <explode_bomb>
+0x0000000000400fb2 <+111>:   mov    $0x0,%eax
+0x0000000000400fb7 <+116>:   jmp    0x400fbe <phase_3+123>
+0x0000000000400fb9 <+118>:   mov    $0x137,%eax
+0x0000000000400fbe <+123>:   cmp    0xc(%rsp),%eax
+0x0000000000400fc2 <+127>:   je     0x400fc9 <phase_3+134>
+0x0000000000400fc4 <+129>:   callq  0x40143a <explode_bomb>
+0x0000000000400fc9 <+134>:   add    $0x18,%rsp
+0x0000000000400fcd <+138>:   retq
+```
+
+It's notable that the command `jmpq *0x402470(,%rax,8)` means jump to the address stored in the `%rax * 8 + 0x402470`. We can print the values near 0x402470 by `x/8g 0x402470`:
+
+```assembly
+(gdb) x/8g 0x402470
+0x402470:       0x0000000000400f7c      0x0000000000400fb9
+0x402480:       0x0000000000400f83      0x0000000000400f8a
+0x402490:       0x0000000000400f91      0x0000000000400f98
+0x4024a0:       0x0000000000400f9f      0x0000000000400fa6
+```
+
+ You can find it is referred to the command in `phase_3`. Now I realize it may be a switch-case, and I can get the corresponding relationship as follow:
+
+| Key  | Value |
+| :--: | :---: |
+|  0   | 0xcf  |
+|  1   | 0x137 |
+|  2   | 0x2c3 |
+|  3   | 0x100 |
+|  4   | 0x185 |
+|  5   | 0xce  |
+|  6   | 0x2aa |
+|  7   | 0x147 |
+
+If you want to defuse the bomb more quickly, you can just input an integer which is smaller than 7, and pause it by breakpoint, find the corresponding target integer by using `stepi` command or `nexti` command.
