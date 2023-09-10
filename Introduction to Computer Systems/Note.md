@@ -1161,3 +1161,87 @@ It's notable that the command `jmpq *0x402470(,%rax,8)` means jump to the addres
 |  7   | 0x147 |
 
 If you want to defuse the bomb more quickly, you can just input an integer which is smaller than 7, and pause it by breakpoint, find the corresponding target integer by using `stepi` command or `nexti` command.
+
+### Bomb 4
+
+I can also easily find that I need two integers as input, and I input `1 2` for test. Here's the assembly code for `phase_4`.
+
+```assembly
+0x000000000040100c <+0>:     sub    $0x18,%rsp
+0x0000000000401010 <+4>:     lea    0xc(%rsp),%rcx
+0x0000000000401015 <+9>:     lea    0x8(%rsp),%rdx
+0x000000000040101a <+14>:    mov    $0x4025cf,%esi
+0x000000000040101f <+19>:    mov    $0x0,%eax
+0x0000000000401024 <+24>:    callq  0x400bf0 <__isoc99_sscanf@plt>
+0x0000000000401029 <+29>:    cmp    $0x2,%eax
+0x000000000040102c <+32>:    jne    0x401035 <phase_4+41>
+0x000000000040102e <+34>:    cmpl   $0xe,0x8(%rsp)
+0x0000000000401033 <+39>:    jbe    0x40103a <phase_4+46>
+0x0000000000401035 <+41>:    callq  0x40143a <explode_bomb>
+0x000000000040103a <+46>:    mov    $0xe,%edx
+0x000000000040103f <+51>:    mov    $0x0,%esi
+0x0000000000401044 <+56>:    mov    0x8(%rsp),%edi
+0x0000000000401048 <+60>:    callq  0x400fce <func4>
+0x000000000040104d <+65>:    test   %eax,%eax
+0x000000000040104f <+67>:    jne    0x401058 <phase_4+76>
+0x0000000000401051 <+69>:    cmpl   $0x0,0xc(%rsp)
+0x0000000000401056 <+74>:    je     0x40105d <phase_4+81>
+0x0000000000401058 <+76>:    callq  0x40143a <explode_bomb>
+0x000000000040105d <+81>:    add    $0x18,%rsp
+0x0000000000401061 <+85>:    retq
+```
+
+I notice `lea 0x8(%rsp),%rdx`, `cmpl $0xe,0x8(%rsp)` and `jbe 0x40103a <phase_4+46>`, so I need the first integer less than or equal to `0xe` and I can move onto `<phase_4+46>`.
+
+Before it calls `func4`, `%rdi` is assigned as my first integer, `%rsi` is assigned as 0, `%rdx` is assigned as `0xe = 14`. Now let me focus on `func4` (it calls itself, i.e., Recursion):
+
+```assembly
+0x0000000000400fce <+0>:     sub    $0x8,%rsp
+0x0000000000400fd2 <+4>:     mov    %edx,%eax								# %eax = %edx = 14
+0x0000000000400fd4 <+6>:     sub    %esi,%eax								# %eax = %eax - %esi = 14
+0x0000000000400fd6 <+8>:     mov    %eax,%ecx								# %ecx = 14
+0x0000000000400fd8 <+10>:    shr    $0x1f,%ecx							# shift right 0x1f with 14 bits, and %ecx get 0
+0x0000000000400fdb <+13>:    add    %ecx,%eax								# %eax = %eax + %ecx = 14
+0x0000000000400fdd <+15>:    sar    %eax										# shift right %eax with 1 bits, %eax = 7
+0x0000000000400fdf <+17>:    lea    (%rax,%rsi,1),%ecx			# %ecx = %rax + %rsi = 7
+0x0000000000400fe2 <+20>:    cmp    %edi,%ecx								# cmp my first int and 7
+0x0000000000400fe4 <+22>:    jle    0x400ff2 <func4+36>			# jump if my first int >= 7 ------- case 1
+0x0000000000400fe6 <+24>:    lea    -0x1(%rcx),%edx					# %edx = %rcx - 1 = 6
+0x0000000000400fe9 <+27>:    callq  0x400fce <func4>				# call func4
+0x0000000000400fee <+32>:    add    %eax,%eax
+0x0000000000400ff0 <+34>:    jmp    0x401007 <func4+57>
+0x0000000000400ff2 <+36>:    mov    $0x0,%eax								# %eax = 0
+0x0000000000400ff7 <+41>:    cmp    %edi,%ecx
+0x0000000000400ff9 <+43>:    jge    0x401007 <func4+57>			# jump if my first int <= 7
+0x0000000000400ffb <+45>:    lea    0x1(%rcx),%esi
+0x0000000000400ffe <+48>:    callq  0x400fce <func4>
+0x0000000000401003 <+53>:    lea    0x1(%rax,%rax,1),%eax
+0x0000000000401007 <+57>:    add    $0x8,%rsp
+0x000000000040100b <+61>:    retq
+```
+
+When I analysis what the codes mean, I find, if my first integer is equal to 7, I can just pass the `func4` without recursion and get a return value `0`.
+
+Back to `phase_4`, I can read it and I know I need `func4` to return `0` and the second integer is `0`. So the first answer is `7 0`.
+
+I want to know what happen in `func4`. `func4` needs 3 parameters, let me name them `a`, `b` and `c`. Here's what I get from assembly code:
+
+```C
+func4(a, b, c):	// a is my int, b = 0 and c = 14 by default
+  d = c - b;
+  e = d >> 0x1f;// e = 0
+  e += d;				// e = d
+  e = e >> 1;		// e is 7 if b = 0 and c = 14
+  if (e + b <= a)
+    if (e + b >= a)
+      return 0;
+    else
+      f = func4(a, e + b + 1, c)
+      return 2 * f + 1;
+  else
+    f = func4(a, b, e + b - 1);
+		return 2 * f;
+```
+
+So I can find `7`, `3`, `1`, `0` are OK for the first integer. Actually, `a` must not be greater than `7`, and then `b` is always `0`, `e = c / 2`. The condition is `a == c/2`.
+
