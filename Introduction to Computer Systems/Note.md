@@ -1245,3 +1245,52 @@ func4(a, b, c):	// a is my int, b = 0 and c = 14 by default
 
 So I can find `7`, `3`, `1`, `0` are OK for the first integer. Actually, `a` must not be greater than `7`, and then `b` is always `0`, `e = c / 2`. The condition is `a == c/2`.
 
+### Bomb 5
+
+After defusing 4 bombs, I can find that I need input a string with 6 characters easily.
+
+I notice command `movzbl 0x4024b0(%rdx),%edx`, and I get `maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?` by `x/s 0x4024b0`. At the same time, I alse notice command `mov $0x40245e,%esi` and I get `flyers` by `x/s 0x40245e`. And after I pass the function compare 2 strings, I can defuse the bomb. So I need to know what `phase_5` do on my strings.
+
+As my comments show, `%rdx` is the index of string in `0x4024b0`, and only the lowest 4 bits is useful. The indexes of `f`, `l`, `y`, `e`, `r`, `s` are `0x9`, `0xf`, `0xe`, `0x5`, `0x6`, `0x7`. So I just find a string, the lowest 4 bits of whose chars is corresponding to these numbers, and I can defuse. And I chose `9?>567`.
+
+```assembly
+0x0000000000401062 <+0>:     push   %rbx
+0x0000000000401063 <+1>:     sub    $0x20,%rsp
+0x0000000000401067 <+5>:     mov    %rdi,%rbx
+0x000000000040106a <+8>:     mov    %fs:0x28,%rax									# Stack Corruption Detection
+0x0000000000401073 <+17>:    mov    %rax,0x18(%rsp)
+0x0000000000401078 <+22>:    xor    %eax,%eax
+0x000000000040107a <+24>:    callq  0x40131b <string_length>
+0x000000000040107f <+29>:    cmp    $0x6,%eax											# 6 characters
+0x0000000000401082 <+32>:    je     0x4010d2 <phase_5+112>
+0x0000000000401084 <+34>:    callq  0x40143a <explode_bomb>
+0x0000000000401089 <+39>:    jmp    0x4010d2 <phase_5+112>
+0x000000000040108b <+41>:    movzbl (%rbx,%rax,1),%ecx						# %rbx is my strings, %rax means index of char
+0x000000000040108f <+45>:    mov    %cl,(%rsp)
+0x0000000000401092 <+48>:    mov    (%rsp),%rdx
+0x0000000000401096 <+52>:    and    $0xf,%edx											# keep the lowest 4 bits of %rdx
+0x0000000000401099 <+55>:    movzbl 0x4024b0(%rdx),%edx						# %rdx is index of 0x4024b0
+0x00000000004010a0 <+62>:    mov    %dl,0x10(%rsp,%rax,1)
+0x00000000004010a4 <+66>:    add    $0x1,%rax											# for each char in my strings
+0x00000000004010a8 <+70>:    cmp    $0x6,%rax
+0x00000000004010ac <+74>:    jne    0x40108b <phase_5+41>
+0x00000000004010ae <+76>:    movb   $0x0,0x16(%rsp)
+0x00000000004010b3 <+81>:    mov    $0x40245e,%esi								# string "flyers" is the 2nd param for strings_not_equal
+0x00000000004010b8 <+86>:    lea    0x10(%rsp),%rdi
+0x00000000004010bd <+91>:    callq  0x401338 <strings_not_equal>
+0x00000000004010c2 <+96>:    test   %eax,%eax
+0x00000000004010c4 <+98>:    je     0x4010d9 <phase_5+119>
+0x00000000004010c6 <+100>:   callq  0x40143a <explode_bomb>
+0x00000000004010cb <+105>:   nopl   0x0(%rax,%rax,1)
+0x00000000004010d0 <+110>:   jmp    0x4010d9 <phase_5+119>
+0x00000000004010d2 <+112>:   mov    $0x0,%eax
+0x00000000004010d7 <+117>:   jmp    0x40108b <phase_5+41>
+0x00000000004010d9 <+119>:   mov    0x18(%rsp),%rax
+0x00000000004010de <+124>:   xor    %fs:0x28,%rax
+0x00000000004010e7 <+133>:   je     0x4010ee <phase_5+140>
+0x00000000004010e9 <+135>:   callq  0x400b30 <__stack_chk_fail@plt>
+0x00000000004010ee <+140>:   add    $0x20,%rsp
+0x00000000004010f2 <+144>:   pop    %rbx
+0x00000000004010f3 <+145>:   retq
+```
+
