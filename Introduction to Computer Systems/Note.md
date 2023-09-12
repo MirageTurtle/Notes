@@ -1251,7 +1251,7 @@ After defusing 4 bombs, I can find that I need input a string with 6 characters 
 
 I notice command `movzbl 0x4024b0(%rdx),%edx`, and I get `maduiersnfotvbylSo you think you can stop the bomb with ctrl-c, do you?` by `x/s 0x4024b0`. At the same time, I alse notice command `mov $0x40245e,%esi` and I get `flyers` by `x/s 0x40245e`. And after I pass the function compare 2 strings, I can defuse the bomb. So I need to know what `phase_5` do on my strings.
 
-As my comments show, `%rdx` is the index of string in `0x4024b0`, and only the lowest 4 bits is useful. The indexes of `f`, `l`, `y`, `e`, `r`, `s` are `0x9`, `0xf`, `0xe`, `0x5`, `0x6`, `0x7`. So I just find a string, the lowest 4 bits of whose chars is corresponding to these numbers, and I can defuse. And I chose `9?>567`.
+As my comments show, `%rdx` is the index of string in `0x4024b0`, and only the lowest 4 bits is useful. The indices of `f`, `l`, `y`, `e`, `r`, `s` are `0x9`, `0xf`, `0xe`, `0x5`, `0x6`, `0x7`. So I just find a string, the lowest 4 bits of whose chars is corresponding to these numbers, and I can defuse. And I chose `9?>567`.
 
 ```assembly
 0x0000000000401062 <+0>:     push   %rbx
@@ -1294,3 +1294,178 @@ As my comments show, `%rdx` is the index of string in `0x4024b0`, and only the l
 0x00000000004010f3 <+145>:   retq
 ```
 
+### Bomb 6
+
+> Because the assembly code of `phase_6` is too long, I'm not going to put all them here. I'll try to explain my thoughts about defusing the bomb by notes.
+
+It's obvious that I need input six integers because of the `read_six_numbers` function call. As analysis for `phase_2`, my six integers are going to be put atop of the frame of `phase_6`.
+
+#### Input
+
+After `read_six_numbers`, we move on
+
+```assembly
+0x0000000000401117 <+35>:    mov    0x0(%r13),%eax
+0x000000000040111b <+39>:    sub    $0x1,%eax
+0x000000000040111e <+42>:    cmp    $0x5,%eax
+0x0000000000401121 <+45>:    jbe    0x401128 <phase_6+52>
+0x0000000000401123 <+47>:    callq  0x40143a <explode_bomb>
+0x0000000000401128 <+52>:    add    $0x1,%r12d
+```
+
+Now here `%r13` is represented as the top of the stack (frame of `phase_6`), so this part of the code is checking the integer `%r13` pointing (now it's the first one) is not larger than 6. Because it use `jbe` to check, I can use `0` as my input (`jbe` is for unsigned int, `0u - 1 = UMax > 6`. Let's move on.
+
+#### Input Check
+
+```assembly
+0x000000000040110e <+26>:    mov    $0x0,%r12d
+...
+0x0000000000401128 <+52>:    add    $0x1,%r12d
+0x000000000040112c <+56>:    cmp    $0x6,%r12d
+0x0000000000401130 <+60>:    je     0x401153 <phase_6+95>
+```
+
+So I know `%r12d` is a counter from 1 to 5 (included), and I guess it corresponds to the indices of my integers.
+
+```assembly
+0x0000000000401132 <+62>:    mov    %r12d,%ebx
+0x0000000000401135 <+65>:    movslq %ebx,%rax
+0x0000000000401138 <+68>:    mov    (%rsp,%rax,4),%eax
+0x000000000040113b <+71>:    cmp    %eax,0x0(%rbp)
+0x000000000040113e <+74>:    jne    0x401145 <phase_6+81>
+0x0000000000401140 <+76>:    callq  0x40143a <explode_bomb>
+0x0000000000401145 <+81>:    add    $0x1,%ebx
+0x0000000000401148 <+84>:    cmp    $0x5,%ebx
+0x000000000040114b <+87>:    jle    0x401135 <phase_6+65>
+0x000000000040114d <+89>:    add    $0x4,%r13
+0x0000000000401151 <+93>:    jmp    0x401114 <phase_6+32>
+```
+
+This part is checking the six integers are all different, likely using a nested loop. Now I know I need input a permutation of 1, 2, 3, 4, 5, 6.
+
+#### Input Process
+
+After checking, the code goes to `0x401153`:
+
+```assembly
+0x000000000040110b <+23>:    mov    %rsp,%r14								# %r14 points the top of the stack
+...
+0x0000000000401153 <+95>:    lea    0x18(%rsp),%rsi					# %rsi points the last integer
+0x0000000000401158 <+100>:   mov    %r14,%rax								# %rax starts from the top of the stack
+0x000000000040115b <+103>:   mov    $0x7,%ecx
+0x0000000000401160 <+108>:   mov    %ecx,%edx
+0x0000000000401162 <+110>:   sub    (%rax),%edx							# %edx = 7 - (%rax)
+0x0000000000401164 <+112>:   mov    %edx,(%rax)							# save 7 - (%rax) at the same place
+0x0000000000401166 <+114>:   add    $0x4,%rax
+0x000000000040116a <+118>:   cmp    %rsi,%rax								# if all the six integers are handled
+0x000000000040116d <+121>:   jne    0x401160 <phase_6+108>
+```
+
+It's like using a loop for every integers in an array `a` and executing `a[i] = 7 - a[i]`.
+
+#### Ordering
+
+##### Part 1
+
+After the process:
+
+```assembly
+0x000000000040116f <+123>:   mov    $0x0,%esi
+0x0000000000401174 <+128>:   jmp    0x401197 <phase_6+163>
+0x0000000000401176 <+130>:   mov    0x8(%rdx),%rdx					# assign %rdx for loop (details below)
+0x000000000040117a <+134>:   add    $0x1,%eax								# %eax (initialized by 1) is must be larger than 1
+0x000000000040117d <+137>:   cmp    %ecx,%eax
+0x000000000040117f <+139>:   jne    0x401176 <phase_6+130>	# loop until %eax == my int
+0x0000000000401181 <+141>:   jmp    0x401188 <phase_6+148>
+0x0000000000401183 <+143>:   mov    $0x6032d0,%edx					# the special process for %ecx == 1
+0x0000000000401188 <+148>:   mov    %rdx,0x20(%rsp,%rsi,2)	# save the address(%rdx) to %rsp + %rsi(index of processed integer) * 2 + 0x20
+0x000000000040118d <+153>:   add    $0x4,%rsi
+0x0000000000401191 <+157>:   cmp    $0x18,%rsi
+0x0000000000401195 <+161>:   je     0x4011ab <phase_6+183>
+0x0000000000401197 <+163>:   mov    (%rsp,%rsi,1),%ecx			# for every int which saved at %ecx
+0x000000000040119a <+166>:   cmp    $0x1,%ecx
+0x000000000040119d <+169>:   jle    0x401183 <phase_6+143>	# if %ecx <= 1, jump
+0x000000000040119f <+171>:   mov    $0x1,%eax								# %eax = 1
+0x00000000004011a4 <+176>:   mov    $0x6032d0,%edx					# %edx = 0x6032d0
+0x00000000004011a9 <+181>:   jmp    0x401176 <phase_6+130>
+```
+
+When I notice `mov $0x0,%esi`, `add $0x4,%rsi` and `cmp $0x18,%rsi`, I realize that `%esi`/`%rsi` is the bias/indices of the stack top for processed integers. I also note that the address `0x6032d0`, but I get a meaningless string `"L\00"`. But I get the name of this address, which is `node1`, and there are six nodes (I use `1 2 3 4 5 6` for input to test):
+
+```assembly
+# (gdb) x/24w 0x6032d0
+0x6032d0 <node1>:       0x0000014c      0x00000001      0x006032e0      0x00000000
+0x6032e0 <node2>:       0x000000a8      0x00000002      0x006032f0      0x00000000
+0x6032f0 <node3>:       0x0000039c      0x00000003      0x00603300      0x00000000
+0x603300 <node4>:       0x000002b3      0x00000004      0x00603310      0x00000000
+0x603310 <node5>:       0x000001dd      0x00000005      0x00603320      0x00000000
+0x603320 <node6>:       0x000001bb      0x00000006      0x00000000      0x00000000
+```
+
+When it executes `mov 0x8(%rdx),%rdx`, `%rdx` is assigned as the corresponding integers, for example, `0x006032e0` for the first time (node1). `0x40117d` means repeating this assignment 5 times, and the corresponding integers is just the address of next node. So this command is just loopting for the integers.
+
+Let me recall what this part does: for every processed int saved at `%ecx`, loop until `%eax == %ecx` (actually, the `%eax` is index (from 1) of nodes), save the address of the node at `%rsp + %rsi(index of processed integer) * 2 + 0x20` (I think `0x20` is because there's 0x18 bytes for my 6 integers). So this part just copies the address of `node i` to `%rsp + 2 * (index of i) + 0x20`. Take my input (`1 2 3 4 5 6`) as an example, the processed input is `6 5 4 3 2 1`, and the addresses are ,`node6`, `node5`, `node4 `, `node3`, `node2`, `node1`:
+
+```assembly
+# (gdb) x/6g ($rsp + 0x20)
+0x7fffffffe560: 0x0000000000603320      0x0000000000603310
+0x7fffffffe570: 0x0000000000603300      0x00000000006032f0
+0x7fffffffe580: 0x00000000006032e0      0x00000000006032d0
+```
+
+##### Part 2
+
+> I use `num i` as the integer saved at `node i`.
+>
+> Be careful, the first node may be not `node1`, and the last node may be not `node6`.
+
+```assembly
+0x00000000004011ab <+183>:   mov    0x20(%rsp),%rbx					# 0x20(%rsp): the address of first node, %rbx is address
+0x00000000004011b0 <+188>:   lea    0x28(%rsp),%rax					# 0x28(%rsp): the address of second address
+0x00000000004011b5 <+193>:   lea    0x50(%rsp),%rsi					# 0x50(%rsp): end of the frame
+0x00000000004011ba <+198>:   mov    %rbx,%rcx								# %rcx starts from the first node
+# loop starts
+0x00000000004011bd <+201>:   mov    (%rax),%rdx							# %rdx is the address saved at (%rax)
+0x00000000004011c0 <+204>:   mov    %rdx,0x8(%rcx)					# save the address to %rcx(address) + 0x08, actually, to the position saved next node address originally (details next code block)
+0x00000000004011c4 <+208>:   add    $0x8,%rax								# next node
+0x00000000004011c8 <+212>:   cmp    %rsi,%rax
+0x00000000004011cb <+215>:   je     0x4011d2 <phase_6+222>
+0x00000000004011cd <+217>:   mov    %rdx,%rcx								# copy the address to %rcx
+0x00000000004011d0 <+220>:   jmp    0x4011bd <phase_6+201>
+# loop ends
+```
+
+Actually, here's two synchronous loop: one loop on nodes in the stack, the other follow the address saved. The one about addresses is more important.
+
+Here shows the result of this loop. The numbers added `*` are the changed part.
+
+```assembly
+# (gdb) x/24w 0x6032d0
+0x6032d0 <node1>:       0x0000014c      0x00000001       0x006032e0      0x00000000
+0x6032e0 <node2>:       0x000000a8      0x00000002      *0x006032d0      0x00000000
+0x6032f0 <node3>:       0x0000039c      0x00000003      *0x006032e0      0x00000000
+0x603300 <node4>:       0x000002b3      0x00000004      *0x006032f0      0x00000000
+0x603310 <node5>:       0x000001dd      0x00000005      *0x00603300      0x00000000
+0x603320 <node6>:       0x000001bb      0x00000006      *0x00603310      0x00000000
+```
+
+If you understand it's for a loop before, I believe you can understand it's for another loop now, in an order you input.
+
+##### Part 3
+
+```assembly
+0x00000000004011d2 <+222>:   movq   $0x0,0x8(%rdx)					# %rdx is the address of the last node
+0x00000000004011da <+230>:   mov    $0x5,%ebp
+# loop starts
+0x00000000004011df <+235>:   mov    0x8(%rbx),%rax					# %rbx starts from the address of the first node
+0x00000000004011e3 <+239>:   mov    (%rax),%eax							# %eax is the num of the address saved at %rax, or you can view it as a pointer.
+0x00000000004011e5 <+241>:   cmp    %eax,(%rbx)
+0x00000000004011e7 <+243>:   jge    0x4011ee <phase_6+250>	# safe if the num pointed by the previous node >= the num pointed by the next one
+0x00000000004011e9 <+245>:   callq  0x40143a <explode_bomb>
+0x00000000004011ee <+250>:   mov    0x8(%rbx),%rbx					# next loop
+0x00000000004011f2 <+254>:   sub    $0x1,%ebp
+0x00000000004011f5 <+257>:   jne    0x4011df <phase_6+235>
+# loop ends
+```
+
+So now I know I need to sort the numbers, `0x0000014c`, `0x000000a8`, `0x0000039c`, `0x000002b3`, `0x000001dd`, `0x000001bb`, in a decreasing order. The order is 3, 4, 5, 6, 1, 2. I need the node order in the stack is 3, 4, 5, 6, 1, 2. So the processed integers are 3, 4, 5, 6, 1, 2, and my input integers are 4, 3, 2, 1, 6, 5. The answer is `4 3 2 1 6 5`.
