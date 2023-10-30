@@ -18,6 +18,10 @@ Wish me luck!
 - [ ] ASU CSE365: Introduction to Cybersecurity
 - [ ] ASU CSE466: Computer Systems Security
 
+### Some tricky skills/shortcuts for Emacs to study
+
+- [ ] How to refresh current buffer (e.g., when file/folder changed in disk.)
+
 ### Others
 
 - [ ] PortSwigger Labs
