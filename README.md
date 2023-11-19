@@ -10,8 +10,8 @@ Wish me luck!
 
 ### Courses and Lectures
 
-+ [x] [The Missing Semester of Your CS Education](The Missing Semester of Your CS Education/Note.md)
-- [ ] [CMU CS15213: Introduction to Computer Systems](Introduction to Computer Systems/README.md)
++ [x] The Missing Semester of Your CS Education
+- [ ] CMU CS15213: Introduction to Computer Systems
 - [ ] MIT 6.S081: Operating System Engineering
 - [ ] Stanford CS144: Computer Network
 - [ ] UCB CS161: Computer Security
@@ -20,14 +20,14 @@ Wish me luck!
 
 ### Some tricky skills/shortcuts for Emacs to study
 
-- [x] How to refresh current buffer (e.g., when file/folder changed in disk.)
-  - `g` (revert-buffer) for folder and the refreshment is auto for files.
++ [x] How to refresh current buffer (e.g., when file/folder changed in disk.)
+  + `g` (revert-buffer) for folder and the refreshment is auto for files.
 
 More things are [here](https://github.com/MirageTurtle/dotfiles).
 
 ### Others
 
-- [ ] [PortSwigger Labs](PortSwigger Labs/Note.md)
+- [ ] PortSwigger Labs
 - [ ] Android Reverse Engineering
 - [ ] CTF Notes
 
