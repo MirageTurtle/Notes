@@ -10,8 +10,8 @@ Wish me luck!
 
 ### Courses and Lectures
 
-+ [x] The Missing Semester of Your CS Education
-- [ ] CMU CS15213: Introduction to Computer Systems
++ [x] [The Missing Semester of Your CS Education](The Missing Semester of Your CS Education/Note.md)
+- [ ] [CMU CS15213: Introduction to Computer Systems](Introduction to Computer Systems/README.md)
 - [ ] MIT 6.S081: Operating System Engineering
 - [ ] Stanford CS144: Computer Network
 - [ ] UCB CS161: Computer Security
@@ -20,19 +20,21 @@ Wish me luck!
 
 ### Some tricky skills/shortcuts for Emacs to study
 
-- [ ] How to refresh current buffer (e.g., when file/folder changed in disk.)
+- [x] How to refresh current buffer (e.g., when file/folder changed in disk.)
+  - `g` (revert-buffer) for folder and the refreshment is auto for files.
+
+More things are [here](https://github.com/MirageTurtle/dotfiles).
 
 ### Others
 
-- [ ] PortSwigger Labs
+- [ ] [PortSwigger Labs](PortSwigger Labs/Note.md)
 - [ ] Android Reverse Engineering
-- [ ] CTF Hub
+- [ ] CTF Notes
 
 ## Change Log
 
 + **2023.04.07**: Init this repo.
-+ **2023.06.23**: Start to study *The Missing Semester of Your CS Education*.
-+ **2023.07.08**: Finish The *Missing Semester of Your CS Education*.
++ **2023.06.23** - **2023.07.08**: *The Missing Semester of Your CS Education*.
 + **2023.07.09**: Try to start learning something about Android Reverse Engineering.
 + **2023.07.11**: Start to study *CMU CS15213: Introduction to Computer Systems*.
 + **2023.08.02**: Try to solve the PortSwigger Labs.
