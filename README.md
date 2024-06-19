@@ -11,25 +11,20 @@ Wish me luck!
 ### Courses and Lectures
 
 + [x] The Missing Semester of Your CS Education
-- [ ] CMU CS15213: Introduction to Computer Systems
-- [ ] MIT 6.S081: Operating System Engineering
-- [ ] Stanford CS144: Computer Network
-- [ ] UCB CS161: Computer Security
-- [ ] ASU CSE365: Introduction to Cybersecurity
-- [ ] ASU CSE466: Computer Systems Security
++ [x] CMU CS15213: Introduction to Computer Systems (Partially studied in a graduate course)
++ [ ] MIT 6.S081: Operating System Engineering
++ [ ] Stanford CS144: Computer Network
++ [ ] UCB CS161: Computer Security
++ [ ] ASU CSE365: Introduction to Cybersecurity
++ [ ] ASU CSE466: Computer Systems Security
 
-### Some tricky skills/shortcuts for Emacs to study
+### Endless Topics
 
-+ [x] How to refresh current buffer (e.g., when file/folder changed in disk.)
-  + `g` (revert-buffer) for folder and the refreshment is auto for files.
-
-More things are [here](https://github.com/MirageTurtle/dotfiles).
-
-### Others
-
-- [ ] PortSwigger Labs
-- [ ] Android Reverse Engineering
-- [ ] CTF Notes
++ AOSP Learning
+  + Following [this post](http://gityuan.com/android/)
++ PortSwigger Labs
++ Android Reverse Engineering
++ CTF Notes
 
 ## Change Log
 
@@ -38,3 +33,4 @@ More things are [here](https://github.com/MirageTurtle/dotfiles).
 + **2023.07.09**: Try to start learning something about Android Reverse Engineering.
 + **2023.07.11**: Start to study *CMU CS15213: Introduction to Computer Systems*.
 + **2023.08.02**: Try to solve the PortSwigger Labs.
++ **2024.06.19**: Reorganize `README.md` and update the overall progress.
