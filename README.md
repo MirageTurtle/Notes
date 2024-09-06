@@ -34,3 +34,4 @@ Wish me luck!
 + **2023.07.11**: Start to study *CMU CS15213: Introduction to Computer Systems*.
 + **2023.08.02**: Try to solve the PortSwigger Labs.
 + **2024.06.19**: Reorganize `README.md` and update the overall progress.
++ **2024.09.06**: Start my AI journey.
